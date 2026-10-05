@@ -2,16 +2,16 @@
 
 ## Status
 
-| Phase                                | State                                                              |
-| ------------------------------------ | ------------------------------------------------------------------ |
-| 0 — Foundations                      | Code done; waiting on owner: Vercel connection + network allowlist |
-| 1 — Accounts and tenancy             | Not started                                                        |
-| 2 — App shell and people             | Not started                                                        |
-| 3 — Sales and collecting             | Not started                                                        |
-| 4 — Purchases, expenses, other money | Not started                                                        |
-| 5 — Dashboard and history            | Not started                                                        |
-| 6 — Reports                          | Not started                                                        |
-| 7 — Hardening and launch             | Not started                                                        |
+| Phase                                | State                                     |
+| ------------------------------------ | ----------------------------------------- |
+| 0 — Foundations                      | Done — live at https://daloyra.vercel.app |
+| 1 — Accounts and tenancy             | Not started                               |
+| 2 — App shell and people             | Not started                               |
+| 3 — Sales and collecting             | Not started                               |
+| 4 — Purchases, expenses, other money | Not started                               |
+| 5 — Dashboard and history            | Not started                               |
+| 6 — Reports                          | Not started                               |
+| 7 — Hardening and launch             | Not started                               |
 
 ## Phase 0 — what exists
 
@@ -56,6 +56,7 @@ D1–D14 were proposed to the owner and applied by default; the owner may still 
 ## Environment notes
 
 - Supabase dev project ref: `rthblabylzscojupghle` (`https://rthblabylzscojupghle.supabase.co`).
+- Vercel project `daloyra`: https://daloyra.vercel.app (Production currently deploys from branch `claude/daloyra-build-spec-dyputg`). Both public Supabase variables are set for all environments.
 - The cloud sandbox network blocks `api.supabase.com`, `*.supabase.co`, `api.vercel.com` and
   `ui.shadcn.com` until they are added to the environment's allowed domains.
 
