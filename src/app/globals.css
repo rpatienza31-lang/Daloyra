@@ -1,0 +1,109 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * Daloyra design tokens (SPEC Section 12).
+ * Raw brand values live here; shadcn/ui semantic names map onto them so a
+ * dark theme can be added later by overriding only this block.
+ */
+:root {
+  --brand: #0f6b74;
+  --brand-hover: #0b555c;
+  --brand-tint: #e6f2f3;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+
+  --surface-page: #f7f8fa;
+  --surface-card: #ffffff;
+  --border-hairline: #e5e7eb;
+
+  --money-in: #16a34a;
+  --money-out: #dc2626;
+  --warning: #d97706;
+
+  --radius-card: 16px;
+  --radius-control: 10px;
+  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 4px 16px rgb(15 23 42 / 0.04);
+
+  /* shadcn/ui semantic tokens */
+  --background: var(--surface-page);
+  --foreground: var(--text-primary);
+  --card: var(--surface-card);
+  --card-foreground: var(--text-primary);
+  --popover: var(--surface-card);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--brand);
+  --primary-foreground: #ffffff;
+  --secondary: var(--brand-tint);
+  --secondary-foreground: var(--brand-hover);
+  --muted: #f1f5f9;
+  --muted-foreground: var(--text-secondary);
+  --accent: var(--brand-tint);
+  --accent-foreground: var(--brand-hover);
+  --destructive: var(--money-out);
+  --border: var(--border-hairline);
+  --input: var(--border-hairline);
+  --ring: var(--brand);
+  --radius: var(--radius-control);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--brand-hover);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-money-in: var(--money-in);
+  --color-money-out: var(--money-out);
+  --color-warning: var(--warning);
+  --color-text-muted: var(--text-muted);
+
+  --radius-card: var(--radius-card);
+  --radius-control: var(--radius-control);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius-card);
+
+  --shadow-soft: var(--shadow-soft);
+
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-jakarta);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background font-sans text-foreground;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-heading tracking-tight;
+  }
+}
+
+/* Every amount uses tabular figures so columns of money line up. */
+@utility amount {
+  font-variant-numeric: tabular-nums;
+}
