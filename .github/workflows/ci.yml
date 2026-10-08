@@ -29,3 +29,19 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+
+  database:
+    name: Database tests (RLS, tenant isolation, money rules)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # A throwaway local Supabase: applies every migration in supabase/migrations.
+      - run: npx supabase start -x studio,imgproxy,realtime,edge-runtime,logflare,vector,supavisor,mailpit
+      - run: npx supabase test db
+      - name: Generated database types are up to date
+        run: npm run db:types && git diff --exit-code src/types/database.ts

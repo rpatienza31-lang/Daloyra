@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
-import { updateSession } from "@/lib/supabase/proxy";
+import { redirectWithCookies, updateSession } from "@/lib/supabase/proxy";
 import { buildContentSecurityPolicy } from "@/lib/security";
+import { isPublicPath, isSignedOutOnlyPath, routes } from "@/lib/routes";
 
 export async function proxy(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
@@ -11,7 +12,19 @@ export async function proxy(request: NextRequest) {
   requestHeaders.set("x-nonce", nonce);
   requestHeaders.set("Content-Security-Policy", csp);
 
-  const response = await updateSession(request, requestHeaders);
+  const { response, isSignedIn } = await updateSession(request, requestHeaders);
+  const { pathname, search } = request.nextUrl;
+
+  // Optimistic redirects only. Layouts, Server Actions and RLS do the real checks.
+  if (!isSignedIn && !isPublicPath(pathname)) {
+    const url = new URL(routes.login, request.url);
+    url.searchParams.set("next", pathname + search);
+    return redirectWithCookies(url, response);
+  }
+  if (isSignedIn && isSignedOutOnlyPath(pathname)) {
+    return redirectWithCookies(new URL(routes.dashboard, request.url), response);
+  }
+
   response.headers.set("Content-Security-Policy", csp);
   return response;
 }
