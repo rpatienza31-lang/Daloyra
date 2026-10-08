@@ -98,6 +98,22 @@ begin
 end;
 $$;
 
+-- Like tests.affected, for deletes on storage tables. Hosted Supabase blocks direct SQL
+-- deletes there with its own trigger; that also counts as "nothing deleted".
+create function tests.deleted(p_sql text) returns bigint language plpgsql as $$
+declare n bigint;
+begin
+  execute p_sql;
+  get diagnostics n = row_count;
+  return n;
+exception when others then
+  if sqlerrm like 'Direct deletion from storage tables is not allowed%' then
+    return 0;
+  end if;
+  raise;
+end;
+$$;
+
 grant execute on all functions in schema tests to anon, authenticated;
 
 -- ---------------------------------------------------------------------------
@@ -271,7 +287,7 @@ select is(
 );
 
 select is(
-  tests.affected($$ delete from storage.objects where name = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb/logo.png' $$),
+  tests.deleted($$ delete from storage.objects where name = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb/logo.png' $$),
   0::bigint,
   'A cannot delete B''s logo'
 );
