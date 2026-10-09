@@ -98,9 +98,10 @@ D1–D14 were proposed to the owner and applied by default; the owner may still 
 
 ## Phase 1 — setup on Supabase (needed before trying it)
 
-1. **Apply the database migrations** to the dev project (`npx supabase link --project-ref
-rthblabylzscojupghle`, then `npx supabase db push`). Claude can run this from the cloud
-   session once the owner allows it.
+1. **Database migrations: done** (applied 9 Oct 2026). The cloud sandbox cannot open direct
+   database connections, so they were applied through the Supabase Management API (one
+   transaction per file) and recorded in `supabase_migrations.schema_migrations`, so
+   `supabase db push` sees them as applied.
 2. **Allowed links.** Supabase dashboard → project _Daloyra-dev_ → **Authentication** → **URL
    Configuration**:
    - _Site URL_: `https://daloyra.vercel.app`
