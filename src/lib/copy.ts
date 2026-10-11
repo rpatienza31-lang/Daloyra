@@ -71,7 +71,7 @@ export const copy = {
       title: "Check your email",
       body: (email: string) =>
         `We sent a link to ${email}. Open it on this phone or computer to confirm your account.`,
-      spam: "Can't find it? Check your Spam or Promotions folder.",
+      spam: "Can't find it? Check your Spam or Promotions folder. If you already have an account with this email, no new link is sent: log in instead.",
       resend: "Send the link again",
       resending: "Sending…",
       resent: "We sent a new link. It can take a minute to arrive.",
