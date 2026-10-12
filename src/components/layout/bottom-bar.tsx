@@ -31,8 +31,12 @@ export function BottomBar({ footer }: { footer: React.ReactNode }) {
           />
         </li>
         <li>
-          {/* Sales arrives in Phase 3 */}
-          <BarLink label={copy.nav.sales} icon={ShoppingCart} />
+          <BarLink
+            href="/sales"
+            label={copy.nav.sales}
+            icon={ShoppingCart}
+            active={isActive(pathname, "/sales")}
+          />
         </li>
         <li className="flex justify-center">
           <NewSheet variant="fab" />

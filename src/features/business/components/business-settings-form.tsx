@@ -29,9 +29,12 @@ const s = copy.settings.business;
 export function BusinessSettingsForm({
   settings,
   logoUrl,
+  currencyLocked,
 }: {
   settings: BusinessSettings;
   logoUrl: string | null;
+  /** True once money records exist (decision D6). */
+  currencyLocked: boolean;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -137,18 +140,35 @@ export function BusinessSettingsForm({
 
       <section className="flex flex-col gap-5">
         <h2 className="text-lg font-semibold">{s.moneyTitle}</h2>
-        <FormField id="currencyCode" label={o.money.currency} hint={s.currencyHelp}>
-          <NativeSelect
-            id="currencyCode"
-            aria-describedby={describedBy("currencyCode", undefined, s.currencyHelp)}
-            {...form.register("currencyCode")}
-          >
-            {CURRENCIES.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.label}
-              </option>
-            ))}
-          </NativeSelect>
+        <FormField
+          id="currencyCode"
+          label={o.money.currency}
+          hint={currencyLocked ? s.currencyLocked : s.currencyHelp}
+        >
+          {currencyLocked ? (
+            // Not registered: the saved currency is sent unchanged from the form's defaults.
+            <Input
+              id="currencyCode"
+              readOnly
+              value={
+                CURRENCIES.find((c) => c.code === settings.currencyCode)?.label ??
+                settings.currencyCode
+              }
+              aria-describedby={describedBy("currencyCode", undefined, s.currencyLocked)}
+            />
+          ) : (
+            <NativeSelect
+              id="currencyCode"
+              aria-describedby={describedBy("currencyCode", undefined, s.currencyHelp)}
+              {...form.register("currencyCode")}
+            >
+              {CURRENCIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.label}
+                </option>
+              ))}
+            </NativeSelect>
+          )}
         </FormField>
         <FormField
           id="startingCash"

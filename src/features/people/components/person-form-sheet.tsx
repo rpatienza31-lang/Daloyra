@@ -27,16 +27,23 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   /** Edit this person; omit to add a new one. */
   person?: Person;
+  /** Called after an add instead of opening the new person's page (e.g. from the sale form). */
+  onSaved?: (person: { id: string; name: string }) => void;
 }
 
-export function PersonFormSheet({ kind, open, onOpenChange, person }: Props) {
+export function PersonFormSheet({ kind, open, onOpenChange, person, onSaved }: Props) {
   const t = copy.people[kind];
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent title={person ? t.edit : t.add}>
         {/* Remount per opening so an add always starts empty with a fresh id. */}
         {open ? (
-          <PersonForm kind={kind} person={person} onDone={() => onOpenChange(false)} />
+          <PersonForm
+            kind={kind}
+            person={person}
+            onSaved={onSaved}
+            onDone={() => onOpenChange(false)}
+          />
         ) : null}
       </SheetContent>
     </Sheet>
@@ -46,10 +53,12 @@ export function PersonFormSheet({ kind, open, onOpenChange, person }: Props) {
 function PersonForm({
   kind,
   person,
+  onSaved,
   onDone,
 }: {
   kind: PersonKind;
   person?: Person;
+  onSaved?: (person: { id: string; name: string }) => void;
   onDone: () => void;
 }) {
   const router = useRouter();
@@ -89,6 +98,7 @@ function PersonForm({
       toast.success(person ? copy.common.saved : t.added);
       onDone();
       if (person) router.refresh();
+      else if (onSaved) onSaved({ id: values.id, name: values.name });
       else router.push(`${PEOPLE_ROUTES[kind]}/${values.id}`);
     });
   });

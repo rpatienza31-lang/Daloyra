@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { formatMoney, lineTotal, parseMoneyInput, roundMoney, sumMoney } from "./money";
+import {
+  compareMoney,
+  formatMoney,
+  formatQuantity,
+  lineTotal,
+  parseMoneyInput,
+  parseQuantityInput,
+  roundMoney,
+  subtractMoney,
+  sumMoney,
+} from "./money";
 
 describe("roundMoney", () => {
   it("rounds half-up to 2 decimals", () => {
@@ -50,5 +60,42 @@ describe("formatMoney", () => {
   });
   it("shows the sign on negatives", () => {
     expect(formatMoney("-50")).toBe("-₱50.00");
+  });
+});
+
+describe("parseQuantityInput", () => {
+  it("accepts up to 3 decimals and thousands separators", () => {
+    expect(parseQuantityInput("2")).toBe("2");
+    expect(parseQuantityInput("1.333")).toBe("1.333");
+    expect(parseQuantityInput("1,000.5")).toBe("1000.5");
+  });
+
+  it("rejects zero, negatives, 4 decimals and words", () => {
+    for (const raw of ["0", "0.000", "-1", "1.0001", "two", ""]) {
+      expect(parseQuantityInput(raw)).toBeNull();
+    }
+  });
+});
+
+describe("previews", () => {
+  it("subtracts exactly", () => {
+    expect(subtractMoney("0.3", "0.1")).toBe("0.20");
+    expect(subtractMoney("165.66", "6.64")).toBe("159.02");
+  });
+
+  it("compares amounts", () => {
+    expect(compareMoney("100.00", "100")).toBe(0);
+    expect(compareMoney("100.01", "100")).toBe(1);
+    expect(compareMoney("99.99", "100")).toBe(-1);
+  });
+
+  it("formats quantities without trailing zeros", () => {
+    expect(formatQuantity("1.500")).toBe("1.5");
+    expect(formatQuantity("12.000")).toBe("12");
+  });
+
+  it("matches the database line rounding", () => {
+    expect(lineTotal("1.333", "49.99")).toBe("66.64");
+    expect(lineTotal("0.333", "0.05")).toBe("0.02");
   });
 });

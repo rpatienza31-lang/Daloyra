@@ -41,8 +41,8 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: n.groups.moneyIn,
     items: [
-      { href: "/sales", label: n.sales, icon: ShoppingCart, available: false },
-      { href: "/receivables", label: n.toCollect, icon: HandCoins, available: false },
+      { href: "/sales", label: n.sales, icon: ShoppingCart, available: true },
+      { href: "/receivables", label: n.toCollect, icon: HandCoins, available: true },
     ],
   },
   {
@@ -83,10 +83,10 @@ export interface NewItem {
 
 /** The "+ New" sheet (SPEC Section 12). */
 export const NEW_MONEY_ITEMS: NewItem[] = [
-  { key: "sale", label: n.sale, icon: ShoppingCart, href: null },
+  { key: "sale", label: n.sale, icon: ShoppingCart, href: "/sales/new" },
   { key: "expense", label: n.expense, icon: Receipt, href: null },
   { key: "purchase", label: n.purchase, icon: Truck, href: null },
-  { key: "payment-received", label: n.paymentReceived, icon: ArrowDownLeft, href: null },
+  { key: "payment-received", label: n.paymentReceived, icon: ArrowDownLeft, href: "/receivables" },
   { key: "payment-made", label: n.paymentMade, icon: ArrowUpRight, href: null },
   { key: "other-money", label: n.otherMoney, icon: ArrowLeftRight, href: null },
 ];

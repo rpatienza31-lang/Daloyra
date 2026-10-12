@@ -30,9 +30,11 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         body={t.emptyBody}
         action={
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button size="lg" disabled title={copy.nav.comingSoon}>
-              <ShoppingCart aria-hidden />
-              {t.recordSale}
+            <Button asChild size="lg">
+              <Link href="/sales/new">
+                <ShoppingCart aria-hidden />
+                {t.recordSale}
+              </Link>
             </Button>
             <Button size="lg" variant="outline" disabled title={copy.nav.comingSoon}>
               <Receipt aria-hidden />

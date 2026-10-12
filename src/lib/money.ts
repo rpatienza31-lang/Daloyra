@@ -58,3 +58,33 @@ export function formatMoney(amount: Decimal.Value, currencyCode = "PHP", locale 
   // Intl formats decimal strings exactly, with no float conversion.
   return formatter.format(roundMoney(amount) as `${number}`);
 }
+
+/** Largest quantity that fits numeric(12,3). */
+export const MAX_QUANTITY = "999999999.999";
+
+/**
+ * Parse a typed quantity into a canonical string with up to 3 decimals, or null.
+ * Must be greater than 0. Accepts "2", "1.5", "1,000".
+ */
+export function parseQuantityInput(raw: string): string | null {
+  const cleaned = raw.replace(/[,\s]/g, "");
+  if (!/^\d+(\.\d{0,3})?$/.test(cleaned)) return null;
+  const value = new MoneyDecimal(cleaned);
+  if (value.lessThanOrEqualTo(0) || value.greaterThan(MAX_QUANTITY)) return null;
+  return value.toString();
+}
+
+/** a − b, exactly, rounded to 2 decimals. For live previews only. */
+export function subtractMoney(a: Decimal.Value, b: Decimal.Value): string {
+  return roundMoney(new MoneyDecimal(a).minus(b));
+}
+
+/** Compare two amounts: -1, 0 or 1. */
+export function compareMoney(a: Decimal.Value, b: Decimal.Value): -1 | 0 | 1 {
+  return new MoneyDecimal(a).comparedTo(b) as -1 | 0 | 1;
+}
+
+/** A quantity for display: "1.5", "12", "1.333". */
+export function formatQuantity(quantity: Decimal.Value): string {
+  return new MoneyDecimal(quantity).toDecimalPlaces(3).toString();
+}

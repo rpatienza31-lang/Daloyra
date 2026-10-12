@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDaysIso, periodRange, todayIn } from "./dates";
+import { addDaysIso, formatDate, periodRange, todayIn } from "./dates";
 
 describe("todayIn", () => {
   it("uses Manila time, not UTC", () => {
@@ -54,5 +54,12 @@ describe("periodRange", () => {
 describe("addDaysIso", () => {
   it("crosses month ends", () => {
     expect(addDaysIso("2026-10-31", 1)).toBe("2026-11-01");
+  });
+});
+
+describe("formatDate", () => {
+  it("shows the calendar date without shifting it", () => {
+    expect(formatDate("2026-10-12")).toBe("Oct 12, 2026");
+    expect(formatDate("2026-01-01")).toBe("Jan 1, 2026");
   });
 });

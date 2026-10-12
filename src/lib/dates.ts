@@ -63,3 +63,20 @@ export function periodRange(
 export function addDaysIso(date: IsoDate, days: number): IsoDate {
   return format(addDays(parseISO(date), days), "yyyy-MM-dd");
 }
+
+const dateFormatters = new Map<string, Intl.DateTimeFormat>();
+
+/** A calendar date for display, e.g. "Oct 12, 2026". The date is not shifted by timezones. */
+export function formatDate(date: IsoDate, locale = "en-PH"): string {
+  let formatter = dateFormatters.get(locale);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      timeZone: "UTC",
+    });
+    dateFormatters.set(locale, formatter);
+  }
+  return formatter.format(new Date(`${date}T00:00:00Z`));
+}

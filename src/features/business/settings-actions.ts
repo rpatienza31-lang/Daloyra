@@ -57,6 +57,7 @@ export async function updateBusinessSettings(formData: FormData): Promise<Action
   if (error) {
     if (error.message === "date_in_future") return fail(copy.settings.business.dateInFuture);
     if (error.message === "not_allowed") return fail(copy.common.notAllowed);
+    if (error.message === "currency_locked") return fail(copy.settings.business.currencyLocked);
     console.error("update_business_settings failed", error.code, error.message);
     return fail(copy.common.unexpectedError);
   }

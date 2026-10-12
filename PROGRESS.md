@@ -6,8 +6,8 @@
 | ------------------------------------ | ----------------------------------------- |
 | 0 — Foundations                      | Done — live at https://daloyra.vercel.app |
 | 1 — Accounts and tenancy             | Done — approved 12 Oct 2026               |
-| 2 — App shell and people             | Built — waiting for owner check           |
-| 3 — Sales and collecting             | Not started                               |
+| 2 — App shell and people             | Done — approved 12 Oct 2026               |
+| 3 — Sales and collecting             | Built — waiting for owner check           |
 | 4 — Purchases, expenses, other money | Not started                               |
 | 5 — Dashboard and history            | Not started                               |
 | 6 — Reports                          | Not started                               |
@@ -77,6 +77,40 @@
   currency, starting cash and date), `/settings/categories`, `/settings/account` (name, change
   password). The dashboard shows the first-time empty state with its three buttons.
 
+## Phase 3 — what exists
+
+- **Database** (`20261013000100_sales.sql`): `sales`, `sale_items`, `customer_payments`.
+  - `line_total = round(quantity × unit_price, 2)` and `total = subtotal − discount` are
+    generated columns; `subtotal` is kept equal to the sum of the lines by a trigger.
+  - `private.validate_sale` checks every document rule (at least one item, discount ≤ subtotal,
+    total ≥ paid, a balance needs a customer, no payment before the sale date) at the end of every
+    write function, and again in deferred constraint triggers at commit.
+  - Payments: a trigger locks the sale row and refuses overpayment; payments cannot be edited
+    (void and re-record); voiding a sale voids its payments in the same transaction; the
+    payment's customer always follows the sale.
+  - Write functions (SECURITY DEFINER, role and suspension checked inside): `create_sale`,
+    `update_sale`, `void_sale`, `record_customer_payment`, `void_customer_payment`. The app has
+    SELECT only on the tables. Client-generated ids make retries safe.
+  - `sales_overview` (security invoker): amount paid, balance, payment status and due status,
+    derived from non-voided payments and "today" in the business timezone.
+    `get_amount_to_collect(business, customer?)` sums balances in SQL.
+  - Reference numbers S-0001… skip numbers typed in by hand; currency locks once a sale exists;
+    one audit entry per sale change with an item snapshot, plus payment audit rows.
+- **Database tests**: 181 checks, including `05_sales_money_rules` (71): rounding with fractional
+  quantities, discount limits, status transitions, overpayment, edit limits, void cascade,
+  voided records excluded, split methods, reference numbers, roles, cross-tenant writes and the
+  commit-time check.
+- **App**: `/sales` (filters: all, to collect, paid, voided; payment method), `/sales/new` (quick
+  sale: amount → Save; or several items, discount, customer with inline "new customer", date,
+  reference, notes; Did they pay? with method chips), `/sales/[id]` (items, totals, balance,
+  payments with method pills, Record payment, Edit, Cancel (Void) with the amounts stated,
+  cancel a payment), `/sales/[id]/edit`, `/receivables` (To Collect with the total from SQL).
+  Customer pages show what they owe and their sales. Navigation, "+ New" and the dashboard
+  button now lead to these pages.
+- Tested end to end against the dev database with a temporary account (deleted afterwards):
+  sign in, setup, quick sale, multi-item unpaid sale, part payment, To Collect, refused edit,
+  void.
+
 ## Decisions (where the spec was silent or changed)
 
 | #   | Decision                                                                                                                                                       | Reason                                                                   |
@@ -111,6 +145,12 @@
 | D27 | Pages from later phases appear in the navigation as "Soon" rather than being hidden. | The owner sees the whole shape of the app as it grows. |
 | D28 | The "+ New" sheet also offers Customer and Supplier. | Spec lists only money items; adding people quickly is common. |
 | D29 | Currency can still be changed in Settings; it locks once the first money record exists (D6), enforced when sales arrive in Phase 3. | There are no money records before Phase 3. |
+| D30 | Money tables are read-only for the app; every write goes through a SECURITY DEFINER function that checks membership, role and suspension itself. | Rules that span rows (totals, payments) cannot be bypassed. |
+| D31 | Whole-sale rules are checked at the end of each function and again by deferred triggers at commit; payment overpayment is checked immediately with a row lock. | Editing items passes through in-between states. |
+| D32 | Sale audit entries are written by the sale functions (one per change, with an item snapshot); payments use the generic audit trigger. | One readable entry per document change (D12). |
+| D33 | "Paid in full" sends the word `full`; the database pays exactly the total it computed. | The app never computes a saved amount. |
+| D34 | Staff can record payments only on sales they recorded; manager and owner on any sale. | Matches D10 (staff see their own entries). |
+| D35 | Future sale dates are allowed; a due date cannot be before the sale date. | Spec silent; pre-orders exist. |
 
 D1–D14 were proposed to the owner and applied by default; the owner may still change any of them.
 
@@ -120,6 +160,30 @@ D1–D14 were proposed to the owner and applied by default; the owner may still 
 - Vercel project `daloyra`: https://daloyra.vercel.app (Production currently deploys from branch `claude/daloyra-build-spec-dyputg`). Both public Supabase variables are set for all environments.
 - The cloud sandbox network blocks `api.supabase.com`, `*.supabase.co`, `api.vercel.com` and
   `ui.shadcn.com` until they are added to the environment's allowed domains.
+
+## Phase 3 — try it yourself
+
+Use the newest Vercel preview for branch `claude/vigilant-meitner-pidrdu`. The database changes are
+already applied to the dev project.
+
+1. **Quick sale (phone):** tap **+** → **Sale** → type `150` → **Save sale**. That's 3 taps plus the
+   amount. You see "Sale S-0001", Paid, ₱150.00.
+2. **Sale on credit:** **+** → **Sale** → **List several items**. Add "Rice", qty `1.333`, price
+   `49.99` (line shows ₱66.64) and "Eggs", qty `12`, price `8.25`. Tap **Not yet**, then
+   **Save sale**: it asks for a customer. Tap the person icon next to Customer, add "Aling Nena",
+   pick a due date, **Save sale**. It shows ₱165.64, Unpaid.
+3. **Collect part of it:** **Record payment** (the amount is already the balance). Type `200`:
+   it says that's more than the balance. Type `100`, choose **GCash**, save. It shows Partially
+   Paid, balance ₱65.64, and the payment with a GCash pill.
+4. **More → To Collect:** the sale is listed with ₱65.64 and the total at the top.
+5. **Edit:** open the sale → **Edit**, change prices to `1` → **Save sale**: refused, because
+   ₱100 is already paid. Go back.
+6. **Cancel:** **Cancel this sale (Void)**. The box says it cancels ₱165.64 and 1 payment of
+   ₱100.00. Without a reason it asks for one; write a reason and confirm. The sale shows
+   Voided and disappears from To Collect.
+7. **Sales list:** both sales are listed; try the filters (To collect, Paid, Voided) and the
+   payment method filter. Open **Customers → Aling Nena**: what she owes and her sales.
+8. **Settings → Business:** the currency is now locked.
 
 ## Phase 2 — try it yourself
 
