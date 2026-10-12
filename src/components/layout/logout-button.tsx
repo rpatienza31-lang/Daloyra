@@ -6,7 +6,7 @@ import { copy } from "@/lib/copy";
 export function LogoutButton() {
   return (
     <form action={logOut}>
-      <Button type="submit" variant="ghost">
+      <Button type="submit" variant="ghost" className="w-full justify-start">
         <LogOut aria-hidden />
         {copy.auth.logout}
       </Button>

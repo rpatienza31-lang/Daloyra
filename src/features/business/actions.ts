@@ -5,8 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getUserId } from "@/lib/auth";
 import { fail, type ActionResult } from "@/lib/action-result";
 import { copy } from "@/lib/copy";
-import { detectImageType, IMAGE_EXTENSIONS } from "@/lib/image-type";
 import { routes } from "@/lib/routes";
+import { saveLogo } from "./logo";
 import { logoProblem, onboardingSchema } from "./schema";
 
 const FIELDS = [
@@ -70,30 +70,4 @@ export async function createBusiness(formData: FormData): Promise<ActionResult> 
     redirect(`${routes.dashboard}?notice=logo_failed`);
   }
   redirect(routes.dashboard);
-}
-
-async function saveLogo(businessId: string, file: File): Promise<boolean> {
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  const type = detectImageType(bytes);
-  if (!type) return false;
-
-  const supabase = await createClient();
-  const path = `${businessId}/logo-${Date.now()}.${IMAGE_EXTENSIONS[type]}`;
-  const upload = await supabase.storage
-    .from("logos")
-    .upload(path, bytes, { contentType: type, upsert: false });
-  if (upload.error) {
-    console.error("logo upload failed", upload.error.message);
-    return false;
-  }
-
-  const { error } = await supabase
-    .from("businesses")
-    .update({ logo_path: path })
-    .eq("id", businessId);
-  if (error) {
-    console.error("saving logo_path failed", error.code, error.message);
-    return false;
-  }
-  return true;
 }

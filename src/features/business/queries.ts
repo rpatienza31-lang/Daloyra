@@ -71,3 +71,43 @@ export async function getProfileName(): Promise<string | null> {
     .maybeSingle();
   return data?.full_name ?? null;
 }
+
+export interface BusinessSettings {
+  name: string;
+  ownerName: string | null;
+  businessType: string | null;
+  address: string | null;
+  contactNumber: string | null;
+  email: string | null;
+  currencyCode: string;
+  startingCash: string;
+  startingBalanceDate: string;
+  timezone: string;
+  logoPath: string | null;
+}
+
+export async function getBusinessSettings(businessId: string): Promise<BusinessSettings | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("businesses")
+    .select(
+      "name, owner_name, business_type, address, contact_number, email, currency_code, starting_cash_balance::text, starting_balance_date, timezone, logo_path",
+    )
+    .eq("id", businessId)
+    .maybeSingle();
+  if (error) throw new Error("Could not load business settings.", { cause: error });
+  if (!data) return null;
+  return {
+    name: data.name,
+    ownerName: data.owner_name,
+    businessType: data.business_type,
+    address: data.address,
+    contactNumber: data.contact_number,
+    email: data.email,
+    currencyCode: data.currency_code,
+    startingCash: data.starting_cash_balance,
+    startingBalanceDate: data.starting_balance_date,
+    timezone: data.timezone,
+    logoPath: data.logo_path,
+  };
+}

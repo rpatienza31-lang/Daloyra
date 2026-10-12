@@ -75,6 +75,44 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"customers": {
+                  Row: {
+                    "address": string | null,"archived_at": string | null,"business_id": string,"created_at": string,"created_by": string | null,"email": string | null,"id": string,"name": string,"notes": string | null,"phone": string | null,"updated_at": string,"updated_by": string | null
+                  }
+                  Insert: {
+                    "address"?: string | null,"archived_at"?: string | null,"business_id": string,"created_at"?: string,"created_by"?: string | null,"email"?: string | null,"id"?: string,"name": string,"notes"?: string | null,"phone"?: string | null,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Update: {
+                    "address"?: string | null,"archived_at"?: string | null,"business_id"?: string,"created_at"?: string,"created_by"?: string | null,"email"?: string | null,"id"?: string,"name"?: string,"notes"?: string | null,"phone"?: string | null,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "customers_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"expense_categories": {
+                  Row: {
+                    "archived_at": string | null,"business_id": string,"created_at": string,"created_by": string | null,"id": string,"is_default": boolean,"name": string,"updated_at": string,"updated_by": string | null
+                  }
+                  Insert: {
+                    "archived_at"?: string | null,"business_id": string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"is_default"?: boolean,"name": string,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Update: {
+                    "archived_at"?: string | null,"business_id"?: string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"is_default"?: boolean,"name"?: string,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "expense_categories_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"plans": {
                   Row: {
                     "code": string,"created_at": string,"id": string,"is_active": boolean,"limits": NonNullable<Json>,"name": string,"price_monthly": number,"updated_at": string
@@ -139,6 +177,25 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"suppliers": {
+                  Row: {
+                    "address": string | null,"archived_at": string | null,"business_id": string,"created_at": string,"created_by": string | null,"email": string | null,"id": string,"name": string,"notes": string | null,"phone": string | null,"updated_at": string,"updated_by": string | null
+                  }
+                  Insert: {
+                    "address"?: string | null,"archived_at"?: string | null,"business_id": string,"created_at"?: string,"created_by"?: string | null,"email"?: string | null,"id"?: string,"name": string,"notes"?: string | null,"phone"?: string | null,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Update: {
+                    "address"?: string | null,"archived_at"?: string | null,"business_id"?: string,"created_at"?: string,"created_by"?: string | null,"email"?: string | null,"id"?: string,"name"?: string,"notes"?: string | null,"phone"?: string | null,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "suppliers_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    }
+                  ]
                 }
           }
           Views: {
@@ -147,6 +204,9 @@ isOneToOne: false
           Functions: {
             "create_business":
 { Args: { "p_address"?: string,"p_business_id": string,"p_business_type"?: string,"p_contact_number"?: string,"p_currency_code"?: string,"p_email"?: string,"p_name": string,"p_owner_name"?: string,"p_starting_cash_balance"?: string,"p_timezone"?: string }; Returns: string
+                           },
+"update_business_settings":
+{ Args: { "p_address": string,"p_business_id": string,"p_business_type": string,"p_contact_number": string,"p_currency_code": string,"p_email": string,"p_name": string,"p_owner_name": string,"p_starting_balance_date": string,"p_starting_cash_balance": string }; Returns: undefined
                            }
           }
           Enums: {

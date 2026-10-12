@@ -1,50 +1,84 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { Store } from "lucide-react";
+import { BottomBar } from "@/components/layout/bottom-bar";
 import { LogoutButton } from "@/components/layout/logout-button";
+import { NavGroups } from "@/components/layout/nav-groups";
+import { NewSheet } from "@/components/layout/new-sheet";
+import { Toaster } from "@/components/ui/sonner";
 import { getCurrentBusiness, getLogoUrl } from "@/features/business/queries";
 import { requireUserId } from "@/lib/auth";
 import { copy } from "@/lib/copy";
 import { routes } from "@/lib/routes";
 
 /**
- * Protected area. Every page below needs a signed-in user with a business.
- * The full navigation shell arrives in Phase 2.
+ * Protected app shell: sidebar on desktop, bottom bar on phones (SPEC Section 12).
+ * Every page below needs a signed-in user with a business.
  */
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   await requireUserId();
   const business = await getCurrentBusiness();
   if (!business) redirect(routes.onboarding);
   const logoUrl = await getLogoUrl(business.logoPath);
+  const suspended = business.status === "suspended";
+
+  const brand = (
+    <Link
+      href={routes.dashboard}
+      className="flex min-w-0 items-center gap-3 rounded-control focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+    >
+      <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-control border border-border bg-muted">
+        {logoUrl ? (
+          // Signed URL from private storage; next/image would need remote config per project.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={logoUrl} alt="" className="size-full object-contain" />
+        ) : (
+          <Store aria-hidden className="size-5 text-muted-foreground" />
+        )}
+      </span>
+      <span className="truncate font-heading font-semibold">{business.name}</span>
+    </Link>
+  );
 
   return (
-    <div className="flex min-h-full flex-1 flex-col">
-      <header className="border-b border-border bg-card">
-        <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between gap-3 px-4 md:px-8">
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-control border border-border bg-muted">
-              {logoUrl ? (
-                // Signed URL from private storage; next/image would need remote config per project.
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={logoUrl} alt="" className="size-full object-contain" />
-              ) : (
-                <Store aria-hidden className="size-5 text-muted-foreground" />
-              )}
-            </div>
-            <p className="truncate font-heading font-semibold">{business.name}</p>
-          </div>
+    <div className="flex min-h-full flex-1">
+      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-border bg-card md:flex">
+        <div className="flex h-16 items-center px-4">
+          <span className="font-heading text-lg font-bold text-primary">{copy.brand.name}</span>
+        </div>
+        <nav aria-label={copy.nav.mainNav} className="flex-1 overflow-y-auto px-3 py-2">
+          <NavGroups />
+        </nav>
+        <div className="border-t border-border p-3">
           <LogoutButton />
         </div>
-      </header>
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 md:px-8 md:py-8">
-        {business.status === "suspended" ? (
-          <div role="alert" className="rounded-card border border-destructive/30 bg-card p-6">
-            <h1 className="text-xl font-bold">{copy.app.suspended.title}</h1>
-            <p className="mt-2 text-muted-foreground">{copy.app.suspended.body}</p>
+      </aside>
+
+      <div className="flex min-w-0 flex-1 flex-col md:pl-60">
+        <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
+          <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 px-4 md:px-8">
+            {brand}
+            {suspended ? null : (
+              <div className="hidden md:block">
+                <NewSheet variant="button" />
+              </div>
+            )}
           </div>
-        ) : (
-          children
-        )}
-      </main>
+        </header>
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-6 pb-28 md:px-8 md:pt-8 md:pb-10">
+          {suspended ? (
+            <div role="alert" className="rounded-card border border-destructive/30 bg-card p-6">
+              <h1 className="text-xl font-bold">{copy.app.suspended.title}</h1>
+              <p className="mt-2 text-muted-foreground">{copy.app.suspended.body}</p>
+            </div>
+          ) : (
+            children
+          )}
+        </main>
+      </div>
+
+      <BottomBar footer={<LogoutButton />} />
+      <Toaster />
     </div>
   );
 }

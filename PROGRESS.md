@@ -5,8 +5,8 @@
 | Phase                                | State                                     |
 | ------------------------------------ | ----------------------------------------- |
 | 0 — Foundations                      | Done — live at https://daloyra.vercel.app |
-| 1 — Accounts and tenancy             | Built — waiting for owner check           |
-| 2 — App shell and people             | Not started                               |
+| 1 — Accounts and tenancy             | Done — approved 12 Oct 2026               |
+| 2 — App shell and people             | Built — waiting for owner check           |
 | 3 — Sales and collecting             | Not started                               |
 | 4 — Purchases, expenses, other money | Not started                               |
 | 5 — Dashboard and history            | Not started                               |
@@ -56,6 +56,27 @@
 - `src/lib/permissions.ts` (`can(role, action)`), `src/lib/routes.ts` (safe `next` redirects),
   `src/lib/image-type.ts` (logo bytes are checked, not just the file name); 44 unit tests, 3 e2e.
 
+## Phase 2 — what exists
+
+- **Database**: `customers`, `suppliers` (same shape) and `expense_categories` (names unique per
+  business ignoring capitals; 9 defaults added by a trigger on new businesses and backfilled).
+  Everyone in a business can view and add customers/suppliers; owner and manager edit and archive;
+  categories are managed by owner and manager. No deletes. `created_by`/`updated_by` are stamped
+  by a trigger. `update_business_settings(...)` saves the profile with the starting cash as a
+  decimal string and refuses a starting date after today in the business timezone.
+- **Database tests**: 110 checks (Phase 1 suites, now also covering the new tables
+  automatically, plus `03_people_and_categories` and `04_business_settings`).
+- **App shell**: desktop sidebar (Overview · Money In · Money Out · People · Insights ·
+  Settings; pages from later phases show "Soon"), top bar with business name, logo and "+ New";
+  phone bottom bar Home · Sales · **+** · Expenses · More. The "+ New" sheet lists the six money
+  forms (coming in Phases 3–4) plus Customer and Supplier.
+- **Shared components**: page header, empty state, searchable/sortable data table that turns into
+  stacked cards under 768 px (TanStack Table v9), side sheet, confirmation dialog, toasts, badge.
+- **Pages**: `/customers`, `/customers/[id]`, `/suppliers`, `/suppliers/[id]` (add, edit,
+  archive, restore, search, active/archived), `/settings/business` (profile, logo change/remove,
+  currency, starting cash and date), `/settings/categories`, `/settings/account` (name, change
+  password). The dashboard shows the first-time empty state with its three buttons.
+
 ## Decisions (where the spec was silent or changed)
 
 | #   | Decision                                                                                                                                                       | Reason                                                                   |
@@ -86,6 +107,10 @@
 | D23 | Default expense categories are added to `create_business` in Phase 2, with a backfill for businesses created before then. | The categories table arrives in Phase 2. |
 | D24 | Database tests use pgTAP and run in GitHub Actions on every push (local Supabase); the hosted project is never used for tests. | D17; keeps test data out of the hosted database. |
 | D25 | Login errors never reveal whether an email is registered; sign-up and password reset show the same message either way. | Account privacy. |
+| D26 | Customers, suppliers and categories are saved directly through the Data API (RLS and column grants decide access); money records will go through Postgres functions. | Simple records; the database still enforces every rule. |
+| D27 | Pages from later phases appear in the navigation as "Soon" rather than being hidden. | The owner sees the whole shape of the app as it grows. |
+| D28 | The "+ New" sheet also offers Customer and Supplier. | Spec lists only money items; adding people quickly is common. |
+| D29 | Currency can still be changed in Settings; it locks once the first money record exists (D6), enforced when sales arrive in Phase 3. | There are no money records before Phase 3. |
 
 D1–D14 were proposed to the owner and applied by default; the owner may still change any of them.
 
@@ -95,6 +120,33 @@ D1–D14 were proposed to the owner and applied by default; the owner may still 
 - Vercel project `daloyra`: https://daloyra.vercel.app (Production currently deploys from branch `claude/daloyra-build-spec-dyputg`). Both public Supabase variables are set for all environments.
 - The cloud sandbox network blocks `api.supabase.com`, `*.supabase.co`, `api.vercel.com` and
   `ui.shadcn.com` until they are added to the environment's allowed domains.
+
+## Phase 2 — try it yourself
+
+Use the newest Vercel preview for branch `claude/vigilant-meitner-pidrdu` and log in. The
+database changes for Phase 2 are already applied to the dev project.
+
+1. **Phone (or a narrow browser window):** at the bottom you see Home · Sales · **+** · Expenses ·
+   More. Sales and Expenses are greyed out (they arrive next).
+2. Tap **+**: the sheet shows Sale, Expense, Purchase and the payments as "Coming in the next
+   update", plus **Customer** and **Supplier**. Tap **Customer**.
+3. Tap **Save** with the name empty: it says "Enter a name." Type a name and phone number, then
+   **Save**. You land on that customer's page with a "Customer added." message.
+4. Tap **Edit**, change the phone number, **Save**. Then **Archive** → confirm. Go to
+   **More → Customers**: the customer is gone from **Active** and listed under **Archived**.
+   Open it and tap **Restore**.
+5. Add two or three more customers and one supplier; type part of a name in the search box.
+6. **More → Settings → Categories**: you see the 9 default categories. Add "Packaging", rename it,
+   archive it. Try adding "rent": it says you already have that category.
+7. **Settings → Business**: change the starting cash to `2500.50` (it shows ₱2,500.50 below),
+   change the logo, **Save**. The new logo appears at the top. Try a starting date in the future:
+   it is refused.
+8. **Settings → Account**: change your name; change your password, log out and log in with it.
+9. **Computer (wide window):** the sidebar shows all sections, with "Soon" on pages still to come,
+   and a **+ New** button at the top right. Customer lists show as a table you can sort by
+   clicking a column title.
+10. With your second test account (if you made one), check it cannot see the first account's
+    customers or categories.
 
 ## Phase 1 — setup on Supabase (needed before trying it)
 

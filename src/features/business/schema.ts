@@ -96,3 +96,14 @@ export function logoProblem(file: { type: string; size: number }): string | null
   if (file.size > LOGO_MAX_BYTES) return v.logoSize;
   return null;
 }
+
+/** Business settings: the onboarding fields plus the starting cash date. */
+export const businessSettingsSchema = z.object({
+  ...basicsSchema.shape,
+  ...contactSchema.shape,
+  ...moneySchema.shape,
+  // Checked against "today" in the business timezone on the server.
+  startingBalanceDate: z.iso.date(),
+});
+export type BusinessSettingsInput = z.input<typeof businessSettingsSchema>;
+export type BusinessSettingsValues = z.output<typeof businessSettingsSchema>;

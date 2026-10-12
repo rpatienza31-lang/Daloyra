@@ -117,7 +117,7 @@ $$;
 grant execute on all functions in schema tests to anon, authenticated;
 
 -- ---------------------------------------------------------------------------
--- Setup: two users, two businesses, a logo in each
+-- Setup: two users, two businesses, a logo, customer and supplier in each
 -- ---------------------------------------------------------------------------
 select tests.create_user('11111111-1111-4111-8111-111111111111', 'a@example.com');
 select tests.create_user('22222222-2222-4222-8222-222222222222', 'b@example.com');
@@ -127,11 +127,15 @@ select tests.login_as('11111111-1111-4111-8111-111111111111');
 select public.create_business('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Shop A', 'Ana');
 insert into storage.objects (bucket_id, name, owner)
 values ('logos', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/logo.png', '11111111-1111-4111-8111-111111111111');
+insert into public.customers (business_id, name) values ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Customer of A');
+insert into public.suppliers (business_id, name) values ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Supplier of A');
 
 select tests.login_as('22222222-2222-4222-8222-222222222222');
 select public.create_business('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'Shop B', 'Ben');
 insert into storage.objects (bucket_id, name, owner)
 values ('logos', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb/logo.png', '22222222-2222-4222-8222-222222222222');
+insert into public.customers (business_id, name) values ('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'Customer of B');
+insert into public.suppliers (business_id, name) values ('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'Supplier of B');
 
 select plan(27);
 

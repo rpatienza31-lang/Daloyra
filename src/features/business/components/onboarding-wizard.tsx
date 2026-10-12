@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { ImagePlus } from "lucide-react";
-import { useForm, type UseFormReturn } from "react-hook-form";
+import { useForm, useWatch, type UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,11 +10,11 @@ import { FormField, FormMessage, describedBy } from "@/components/forms/form-fie
 import { copy } from "@/lib/copy";
 import { formatMoney, parseMoneyInput } from "@/lib/money";
 import { createBusiness } from "../actions";
+import { LogoPicker } from "./logo-picker";
 import {
   BUSINESS_TYPES,
   CURRENCIES,
   DEFAULT_CURRENCY,
-  LOGO_TYPES,
   ONBOARDING_STEPS,
   logoProblem,
   onboardingSchema,
@@ -241,8 +240,8 @@ function StepDots({ current }: { current: number }) {
 
 function MoneyStep({ form }: { form: UseFormReturn<OnboardingInput, unknown, OnboardingValues> }) {
   const { errors } = form.formState;
-  const currencyCode = form.watch("currencyCode");
-  const startingCash = form.watch("startingCash");
+  const currencyCode = useWatch({ control: form.control, name: "currencyCode" });
+  const startingCash = useWatch({ control: form.control, name: "startingCash" });
   const parsed = parseMoneyInput(startingCash === "" ? "0" : startingCash);
   const s = t.steps.money;
 
@@ -284,70 +283,5 @@ function MoneyStep({ form }: { form: UseFormReturn<OnboardingInput, unknown, Onb
         </p>
       ) : null}
     </>
-  );
-}
-
-function LogoPicker({
-  file,
-  error,
-  onChange,
-}: {
-  file: File | null;
-  error: string | null;
-  onChange: (file: File | null) => void;
-}) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const c = t.steps.contact;
-
-  function select(next: File | null) {
-    setPreviewUrl((old) => {
-      if (old) URL.revokeObjectURL(old);
-      return next ? URL.createObjectURL(next) : null;
-    });
-    onChange(next);
-  }
-
-  return (
-    <FormField id="logo" label={c.logo} optional hint={c.logoHint} error={error ?? undefined}>
-      <div className="flex items-center gap-4">
-        <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-card border border-border bg-muted">
-          {file && previewUrl ? (
-            // A local blob preview; next/image does not apply.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={previewUrl} alt="" className="size-full object-contain" />
-          ) : (
-            <ImagePlus aria-hidden className="size-6 text-muted-foreground" />
-          )}
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="outline" onClick={() => inputRef.current?.click()}>
-            {file ? c.changeLogo : c.chooseLogo}
-          </Button>
-          {file ? (
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => {
-                select(null);
-                if (inputRef.current) inputRef.current.value = "";
-              }}
-            >
-              {c.removeLogo}
-            </Button>
-          ) : null}
-        </div>
-        <input
-          ref={inputRef}
-          id="logo"
-          type="file"
-          accept={LOGO_TYPES.join(",")}
-          className="sr-only"
-          tabIndex={-1}
-          aria-describedby={describedBy("logo", error ?? undefined, c.logoHint)}
-          onChange={(event) => select(event.target.files?.[0] ?? null)}
-        />
-      </div>
-    </FormField>
   );
 }
