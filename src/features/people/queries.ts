@@ -61,3 +61,45 @@ export async function getPerson(
   if (error) throw new Error(`Could not load ${kind}.`, { cause: error });
   return data ? toPerson(data) : null;
 }
+
+export interface PersonTotals {
+  total: string;
+  paid: string;
+  balance: string;
+  count: number;
+}
+
+/** Lifetime totals of a customer or supplier, summed in Postgres (SPEC 7.5). Voided excluded. */
+export async function getPersonTotals(
+  kind: PersonKind,
+  businessId: string,
+  id: string,
+): Promise<PersonTotals> {
+  const supabase = await createClient();
+  const result =
+    kind === "customer"
+      ? await supabase
+          .from("customer_summary")
+          .select(
+            "total:total_sales::text, paid:total_paid::text, balance:balance::text, count:sale_count",
+          )
+          .eq("business_id", businessId)
+          .eq("customer_id", id)
+          .maybeSingle()
+      : await supabase
+          .from("supplier_summary")
+          .select(
+            "total:total_purchases::text, paid:total_paid::text, balance:balance::text, count:purchase_count",
+          )
+          .eq("business_id", businessId)
+          .eq("supplier_id", id)
+          .maybeSingle();
+  if (result.error) throw new Error("Could not load the totals.", { cause: result.error });
+  const row = result.data;
+  return {
+    total: row?.total ?? "0.00",
+    paid: row?.paid ?? "0.00",
+    balance: row?.balance ?? "0.00",
+    count: Number(row?.count ?? 0),
+  };
+}

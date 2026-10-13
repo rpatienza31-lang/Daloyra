@@ -80,3 +80,29 @@ export function formatDate(date: IsoDate, locale = "en-PH"): string {
   }
   return formatter.format(new Date(`${date}T00:00:00Z`));
 }
+
+const monthFormatters = new Map<string, Intl.DateTimeFormat>();
+
+/** A month for chart axes, e.g. "Oct" or "Oct 2026". */
+export function formatMonth(date: IsoDate, withYear = false, locale = "en-PH"): string {
+  const key = `${locale}|${withYear}`;
+  let formatter = monthFormatters.get(key);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, {
+      month: "short",
+      ...(withYear ? { year: "numeric" } : {}),
+      timeZone: "UTC",
+    });
+    monthFormatters.set(key, formatter);
+  }
+  return formatter.format(new Date(`${date}T00:00:00Z`));
+}
+
+/** A day for chart axes, e.g. "Oct 5". */
+export function formatDayShort(date: IsoDate, locale = "en-PH"): string {
+  return new Intl.DateTimeFormat(locale, {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${date}T00:00:00Z`));
+}

@@ -23,6 +23,11 @@
   --money-out: #dc2626;
   --warning: #d97706;
 
+  /* Chart series (identity colors, validated for color-vision deficiency on white) */
+  --chart-sales: #0d9488;
+  --chart-purchases: #eb6834;
+  --chart-expenses: #6250d6;
+
   --radius-card: 16px;
   --radius-control: 10px;
   --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 4px 16px rgb(15 23 42 / 0.04);
@@ -73,6 +78,9 @@
   --color-money-in: var(--money-in);
   --color-money-out: var(--money-out);
   --color-warning: var(--warning);
+  --color-chart-sales: var(--chart-sales);
+  --color-chart-purchases: var(--chart-purchases);
+  --color-chart-expenses: var(--chart-expenses);
   --color-text-muted: var(--text-muted);
 
   --radius-card: var(--radius-card);

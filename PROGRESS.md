@@ -8,8 +8,8 @@
 | 1 — Accounts and tenancy             | Done — approved 12 Oct 2026               |
 | 2 — App shell and people             | Done — approved 12 Oct 2026               |
 | 3 — Sales and collecting             | Done — approved 13 Oct 2026               |
-| 4 — Purchases, expenses, other money | Built — waiting for owner check           |
-| 5 — Dashboard and history            | Not started                               |
+| 4 — Purchases, expenses, other money | Done — approved 13 Oct 2026               |
+| 5 — Dashboard and history            | Built — waiting for owner check           |
 | 6 — Reports                          | Not started                               |
 | 7 — Hardening and launch             | Not started                               |
 
@@ -138,6 +138,34 @@
   you owe and the purchases. Navigation, bottom bar, "+ New" and the dashboard buttons all work.
 - Tested end to end against the dev database with a temporary account (deleted afterwards).
 
+## Phase 5 — what exists
+
+- **Database** (`20261015000100_dashboard_series_feed.sql`, all security invoker):
+  - `get_monthly_series(business, months, end)`: Sales, Purchases, Expenses and Profit per month
+    for the 12 months ending with the period's last month, empty months as zero.
+  - `get_daily_series(business, from, to)`: Sales per day, at most a year.
+  - `transactions_feed` view: every sale, purchase, payment received/made, expense and other money
+    in/out in one list, with party, reference, first item, amount, Money In/Out, method and status
+    (voided records included and flagged).
+  - `customer_summary` / `supplier_summary` views: lifetime totals, paid and balance per person.
+- **Database tests**: 274 checks. New `09_series_and_feed`: every month in the series matches the
+  dashboard for that month, daily sales add up exactly to period Sales, the history's Money In/Out
+  match the dashboard to the centavo, people totals, invalid ranges, and isolation (another
+  business and signed-out visitors see nothing).
+- **App**:
+  - `/dashboard`: "Right now" cards (Sales Today, Cash Balance, Amount to Collect, Amount to
+    Pay), a period filter (Today, This week, This month (default), This year, Custom) with Sales,
+    Purchases, Expenses and Profit, info icons, three charts (Sales vs Purchases vs Expenses by
+    month, Profit by month in green/red, daily Sales trend) each with a "as a table" view,
+    "How money came in" per payment method with a Money In / Money Out toggle, Recent transactions
+    (last 8) and Overdue to collect (top 5). The first-time screen stays until something is
+    recorded.
+  - `/transactions`: the unified history with search, sorting and filters (type, method, status,
+    customer or supplier, dates). Each row opens its sale, purchase, expense or entry.
+  - Customer and supplier pages show total sales/purchases, paid so far and what is still owed.
+- Tested end to end against the dev database with a temporary account and a hand-calculated
+  dataset across the Sept/Oct boundary (deleted afterwards).
+
 ## Decisions (where the spec was silent or changed)
 
 | #   | Decision                                                                                                                                                       | Reason                                                                   |
@@ -181,6 +209,11 @@
 | D36 | "Other Money" gets its own sidebar entry (under Money Out) as well as the "+ New" sheet. | Spec has a page (`/money`) but no menu place for it. |
 | D37 | The dashboard and money-by-method figures were built (and tested) in Phase 4; Phase 5 adds the series, the screens and charts. | Phase 4 must prove every rule in SPEC 3. |
 | D38 | Products, inventory and a POS-style layout come after launch (owner asked; recommended order kept). | Spec 2.3 "Later"; changes how profit is counted. |
+| D39 | Team logins (manager and cashier invitations) come after launch; roles already exist in the database. | Owner decision, 13 Oct. |
+| D40 | The 12-month charts end with the month the selected period ends in (This year shows Jan–Dec). The daily trend needs a period of one year or less. | Spec left the window for a custom period open. |
+| D41 | Staff (later) see no totals on the dashboard and only their own entries in Transactions. | SPEC 8 "own entries only". |
+| D42 | Chart colors: Sales teal, Purchases orange, Expenses violet, checked for color blindness; the brand teal is too muted to tell apart in charts. Profit uses green/red with a minus sign and the word "loss". | Accessibility (SPEC 12). |
+| D43 | Payments in Transactions open their sale or purchase; expenses and other money open in their own list. | One place to edit or cancel each record. |
 
 D1–D14 were proposed to the owner and applied by default; the owner may still change any of them.
 
@@ -190,6 +223,28 @@ D1–D14 were proposed to the owner and applied by default; the owner may still 
 - Vercel project `daloyra`: https://daloyra.vercel.app (Production currently deploys from branch `claude/daloyra-build-spec-dyputg`). Both public Supabase variables are set for all environments.
 - The cloud sandbox network blocks `api.supabase.com`, `*.supabase.co`, `api.vercel.com` and
   `ui.shadcn.com` until they are added to the environment's allowed domains.
+
+## Phase 5 — try it yourself
+
+Use the newest Vercel preview for branch `claude/vigilant-meitner-pidrdu`. Database changes are
+already applied to the dev project. You need a few records first; the ones from Phase 3 and 4
+are fine.
+
+1. Open **Dashboard**. Under "Right now" you see Sales Today, Cash Balance, Amount to Collect and
+   Amount to Pay. Tap the small **ⓘ** next to Cash Balance: one sentence explains it.
+2. Under the period buttons (default **This month**) check Sales, Purchases, Expenses and Profit.
+   Profit should equal Sales − Purchases − Expenses.
+3. Tap **Today**, then **This week**, then **This year**: the four period cards change; the "Right
+   now" cards do not.
+4. Tap **Custom** (scroll the buttons sideways on a phone), choose a From and To date, tap
+   **Show**.
+5. Scroll to the charts. On a computer, hover the bars to see exact amounts; on a phone, tap them.
+   Tap "… as a table" under a chart to see the same numbers as a list.
+6. In **How money came in**, tap **Money Out**: amounts and percentages per payment method.
+7. At the bottom: **Recent transactions** (tap one to open it) and **Overdue to collect**.
+8. Open **Transactions** (on a phone: **More → Transactions**). Type a customer name in the search
+   box. Then choose **Type: Expense** → **Apply**, and **Clear filters**.
+9. Open **Customers** → a customer: you now see Total sales, Paid so far and Owes you.
 
 ## Phase 4 — try it yourself
 

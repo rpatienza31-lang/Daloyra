@@ -5,25 +5,44 @@ import { FormMessage } from "@/components/forms/form-field";
 import { EmptyState } from "@/components/layout/empty-state";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
-import { getCurrentBusiness } from "@/features/business/queries";
+import { getCurrentBusiness, hasMoneyRecords } from "@/features/business/queries";
+import { DashboardView, StaffDashboard } from "@/features/dashboard/components/dashboard-view";
+import { selectPeriod } from "@/features/dashboard/schema";
 import { copy } from "@/lib/copy";
+import { can } from "@/lib/permissions";
 
 export const metadata: Metadata = { title: `${copy.app.dashboard.title} · ${copy.brand.name}` };
 
 export default async function DashboardPage({ searchParams }: PageProps<"/dashboard">) {
   const business = await getCurrentBusiness();
-  const { notice } = await searchParams;
+  if (!business) return null;
+  const params = await searchParams;
   const t = copy.app.dashboard;
+  const notice =
+    params.notice === "logo_failed" ? (
+      <div className="mb-6">
+        <FormMessage>{copy.onboarding.errors.logoFailed}</FormMessage>
+      </div>
+    ) : null;
+
+  if (await hasMoneyRecords(business.id)) {
+    return (
+      <>
+        {notice}
+        {can(business.role, "dashboard.viewTotals") ? (
+          <DashboardView business={business} selected={selectPeriod(params, business.timezone)} />
+        ) : (
+          <StaffDashboard business={business} />
+        )}
+      </>
+    );
+  }
 
   return (
     <>
-      {notice === "logo_failed" ? (
-        <div className="mb-6">
-          <FormMessage>{copy.onboarding.errors.logoFailed}</FormMessage>
-        </div>
-      ) : null}
-      <PageHeader title={t.welcome(business?.name ?? "")} />
-      {/* First-time dashboard (SPEC Section 9, flow 2). Sales and expenses arrive in Phases 3–4. */}
+      {notice}
+      <PageHeader title={t.welcome(business.name)} />
+      {/* First-time dashboard (SPEC Section 9, flow 2). */}
       <EmptyState
         icon={LayoutDashboard}
         title={t.title}

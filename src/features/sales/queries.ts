@@ -144,6 +144,21 @@ export async function listReceivables(
   return data.map(toSummary);
 }
 
+/** Overdue sales, the longest overdue first (dashboard "Overdue to collect"). */
+export async function listOverdue(businessId: string, limit: number): Promise<SaleSummary[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("sales_overview")
+    .select(OVERVIEW_COLUMNS)
+    .eq("business_id", businessId)
+    .is("voided_at", null)
+    .eq("due_status", "overdue")
+    .order("due_date", { ascending: true })
+    .limit(limit);
+  if (error) throw new Error("Could not load overdue sales.", { cause: error });
+  return data.map(toSummary);
+}
+
 /** All sales of one customer, newest first. */
 export async function listCustomerSales(
   businessId: string,

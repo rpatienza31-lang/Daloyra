@@ -6,15 +6,15 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SaleCard } from "@/features/sales/components/sale-columns";
-import { getAmountToCollect, listCustomerSales } from "@/features/sales/queries";
+import { listCustomerSales } from "@/features/sales/queries";
 import { PurchaseCard } from "@/features/purchases/components/purchase-columns";
-import { getAmountToPay, listSupplierPurchases } from "@/features/purchases/queries";
+import { listSupplierPurchases } from "@/features/purchases/queries";
 import { formatMoney } from "@/lib/money";
 import { getCurrentBusiness } from "@/features/business/queries";
 import { copy } from "@/lib/copy";
 import { can } from "@/lib/permissions";
 import { isUuid } from "@/lib/uuid";
-import { getPerson } from "../queries";
+import { getPerson, getPersonTotals, type PersonTotals } from "../queries";
 import { PEOPLE_ROUTES, type PersonKind } from "../schema";
 import { PersonActions } from "./person-actions";
 
@@ -96,18 +96,15 @@ async function CustomerSales({
   currencyCode: string;
   archived: boolean;
 }) {
-  const [sales, owed] = await Promise.all([
+  const [sales, totals] = await Promise.all([
     listCustomerSales(businessId, customerId),
-    getAmountToCollect(businessId, customerId),
+    getPersonTotals("customer", businessId, customerId),
   ]);
   const t = copy.people.customer;
 
   return (
     <section aria-labelledby="customer-sales">
-      <div className="mb-4 rounded-card border border-border bg-card p-5 shadow-soft">
-        <p className="text-sm font-medium text-muted-foreground">{t.owes}</p>
-        <p className="mt-1 text-2xl font-semibold amount">{formatMoney(owed, currencyCode)}</p>
-      </div>
+      <TotalsCard kind="customer" totals={totals} currencyCode={currencyCode} />
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 id="customer-sales" className="text-lg font-semibold">
           {t.historyTitle}
@@ -152,18 +149,15 @@ async function SupplierPurchases({
   currencyCode: string;
   archived: boolean;
 }) {
-  const [sales, owed] = await Promise.all([
+  const [sales, totals] = await Promise.all([
     listSupplierPurchases(businessId, supplierId),
-    getAmountToPay(businessId, supplierId),
+    getPersonTotals("supplier", businessId, supplierId),
   ]);
   const t = copy.people.supplier;
 
   return (
     <section aria-labelledby="supplier-purchases">
-      <div className="mb-4 rounded-card border border-border bg-card p-5 shadow-soft">
-        <p className="text-sm font-medium text-muted-foreground">{t.owes}</p>
-        <p className="mt-1 text-2xl font-semibold amount">{formatMoney(owed, currencyCode)}</p>
-      </div>
+      <TotalsCard kind="supplier" totals={totals} currencyCode={currencyCode} />
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 id="supplier-purchases" className="text-lg font-semibold">
           {t.historyTitle}
@@ -194,5 +188,44 @@ async function SupplierPurchases({
         </ul>
       )}
     </section>
+  );
+}
+
+/** Lifetime totals: sales (or purchases), paid so far, and what is still owed. */
+function TotalsCard({
+  kind,
+  totals,
+  currencyCode,
+}: {
+  kind: PersonKind;
+  totals: PersonTotals;
+  currencyCode: string;
+}) {
+  const t = copy.people[kind];
+  return (
+    <dl
+      data-testid="person-totals"
+      className="mb-4 grid grid-cols-1 gap-4 rounded-card border border-border bg-card p-5 shadow-soft sm:grid-cols-3"
+    >
+      <div>
+        <dt className="text-sm font-medium text-muted-foreground">{t.total}</dt>
+        <dd className="mt-1 text-xl font-semibold amount">
+          {formatMoney(totals.total, currencyCode)}
+        </dd>
+        <dd className="text-xs text-muted-foreground">{t.count(totals.count)}</dd>
+      </div>
+      <div>
+        <dt className="text-sm font-medium text-muted-foreground">{t.paid}</dt>
+        <dd className="mt-1 text-xl font-semibold amount">
+          {formatMoney(totals.paid, currencyCode)}
+        </dd>
+      </div>
+      <div>
+        <dt className="text-sm font-medium text-muted-foreground">{t.owes}</dt>
+        <dd className="mt-1 text-xl font-semibold amount">
+          {formatMoney(totals.balance, currencyCode)}
+        </dd>
+      </div>
+    </dl>
   );
 }

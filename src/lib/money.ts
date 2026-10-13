@@ -88,3 +88,15 @@ export function compareMoney(a: Decimal.Value, b: Decimal.Value): -1 | 0 | 1 {
 export function formatQuantity(quantity: Decimal.Value): string {
   return new MoneyDecimal(quantity).toDecimalPlaces(3).toString();
 }
+
+/**
+ * part / whole as a display percentage, e.g. "42%" or "<1%". For labels only; never saved.
+ * Returns "0%" when the whole is 0.
+ */
+export function sharePercent(part: Decimal.Value, whole: Decimal.Value): string {
+  const w = new MoneyDecimal(whole);
+  if (w.lessThanOrEqualTo(0)) return "0%";
+  const pct = new MoneyDecimal(part).div(w).times(100);
+  if (pct.greaterThan(0) && pct.lessThan(1)) return "<1%";
+  return `${pct.toDecimalPlaces(0, Decimal.ROUND_HALF_UP).toFixed(0)}%`;
+}

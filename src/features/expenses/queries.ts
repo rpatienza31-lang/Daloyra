@@ -41,9 +41,7 @@ export async function listExpenses(
   const supabase = await createClient();
   let query = supabase
     .from("expenses")
-    .select(
-      "id, category_id, expense_date, description, amount:amount::text, method, notes, voided_at, void_reason",
-    )
+    .select(EXPENSE_COLUMNS)
     .eq("business_id", businessId)
     .order("expense_date", { ascending: false })
     .order("created_at", { ascending: false })
@@ -54,11 +52,47 @@ export async function listExpenses(
 
   const { data, error } = await query;
   if (error) throw new Error("Could not load expenses.", { cause: error });
-  const names = new Map(categories.map((c) => [c.id, c.name]));
-  return data.map((e) => ({
+  return data.map((e) => toExpense(e, categories));
+}
+
+/** One expense, voided or not, e.g. when opened from the transaction history. */
+export async function getExpense(
+  businessId: string,
+  id: string,
+  categories: CategoryOption[],
+): Promise<Expense | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("expenses")
+    .select(EXPENSE_COLUMNS)
+    .eq("business_id", businessId)
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw new Error("Could not load the expense.", { cause: error });
+  return data ? toExpense(data, categories) : null;
+}
+
+const EXPENSE_COLUMNS =
+  "id, category_id, expense_date, description, amount:amount::text, method, notes, voided_at, void_reason";
+
+function toExpense(
+  e: {
+    id: string;
+    category_id: string;
+    expense_date: string;
+    description: string | null;
+    amount: string;
+    method: string;
+    notes: string | null;
+    voided_at: string | null;
+    void_reason: string | null;
+  },
+  categories: CategoryOption[],
+): Expense {
+  return {
     id: e.id,
     categoryId: e.category_id,
-    categoryName: names.get(e.category_id) ?? "",
+    categoryName: categories.find((c) => c.id === e.category_id)?.name ?? "",
     expenseDate: e.expense_date,
     description: e.description,
     amount: e.amount,
@@ -66,7 +100,7 @@ export async function listExpenses(
     notes: e.notes,
     voidedAt: e.voided_at,
     voidReason: e.void_reason,
-  }));
+  };
 }
 
 export async function hasAnyExpenses(businessId: string): Promise<boolean> {

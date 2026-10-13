@@ -3,6 +3,7 @@ import {
   compareMoney,
   formatMoney,
   formatQuantity,
+  sharePercent,
   lineTotal,
   parseMoneyInput,
   parseQuantityInput,
@@ -97,5 +98,19 @@ describe("previews", () => {
   it("matches the database line rounding", () => {
     expect(lineTotal("1.333", "49.99")).toBe("66.64");
     expect(lineTotal("0.333", "0.05")).toBe("0.02");
+  });
+});
+
+describe("sharePercent", () => {
+  it("rounds half-up to a whole percent", () => {
+    expect(sharePercent("400.00", "999.99")).toBe("40%");
+    expect(sharePercent("1", "8")).toBe("13%");
+    expect(sharePercent("999.99", "999.99")).toBe("100%");
+  });
+
+  it("shows tiny shares as <1% and handles an empty total", () => {
+    expect(sharePercent("0.01", "1000.00")).toBe("<1%");
+    expect(sharePercent("0.00", "1000.00")).toBe("0%");
+    expect(sharePercent("5.00", "0.00")).toBe("0%");
   });
 });

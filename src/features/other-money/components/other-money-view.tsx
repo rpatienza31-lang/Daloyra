@@ -42,6 +42,7 @@ export function OtherMoneyView({
   canEdit,
   canVoid,
   startAdding,
+  opened,
 }: {
   entries: Entry[];
   currencyCode: string;
@@ -50,9 +51,11 @@ export function OtherMoneyView({
   canEdit: boolean;
   canVoid: boolean;
   startAdding: boolean;
+  /** An entry to open straight away, e.g. from the transaction history. */
+  opened: Entry | null;
 }) {
   const [adding, setAdding] = useState(startAdding && canRecord);
-  const [selected, setSelected] = useState<Entry | null>(null);
+  const [selected, setSelected] = useState<Entry | null>(opened);
 
   const columns = useMemo<DataTableColumn<Entry>[]>(
     () => [

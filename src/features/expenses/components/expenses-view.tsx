@@ -43,6 +43,8 @@ interface Props {
   canVoid: boolean;
   canManageCategories: boolean;
   startAdding: boolean;
+  /** An expense to open straight away, e.g. from the transaction history. */
+  opened: Expense | null;
 }
 
 /** /expenses: list, filters, and create/edit in a side sheet (SPEC Section 10). */
@@ -52,7 +54,7 @@ export function ExpensesView(props: Props) {
   const pathname = usePathname();
   const params = useSearchParams();
   const [adding, setAdding] = useState(props.startAdding && props.canRecord);
-  const [selected, setSelected] = useState<Expense | null>(null);
+  const [selected, setSelected] = useState<Expense | null>(props.opened);
   const money = (value: string) => formatMoney(value, currencyCode);
 
   const columns = useMemo<DataTableColumn<Expense>[]>(
