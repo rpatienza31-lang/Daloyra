@@ -11,7 +11,7 @@
 | 4 — Purchases, expenses, other money | Done — approved 13 Oct 2026               |
 | 5 — Dashboard and history            | Done — approved 13 Oct 2026               |
 | 6 — Reports                          | Done — approved 13 Oct 2026               |
-| 7 — Hardening and launch             | Built — launch steps waiting for owner    |
+| 7 — Hardening and launch             | Launched 13 Oct — legal review pending    |
 
 ## Phase 0 — what exists
 
@@ -215,6 +215,19 @@
   re-checked); CI now fails if a secret key ever reaches browser code.
 - **Smoke test** `e2e/smoke.spec.ts`: log in → set up the business → record a sale → see it on
   the dashboard. Runs against any site with a dedicated test account (see the launch guide).
+
+## Launch status (13 Oct 2026)
+
+- [x] Finished app on the live site (pull request #1 merged).
+- [x] Live database: Daloyra-dev on the Pro plan, daily backups (D54). Test data wiped.
+- [x] Emails sent through Gmail (`daloyra.ph@gmail.com`, sender name "Daloyra"); sign-up
+      confirmation tested end to end by the owner.
+- [x] Smoke test passed on https://daloyra.vercel.app (log in → set up business → record a sale →
+      see it on the dashboard), with temporary accounts that were deleted afterwards.
+- [x] Support email `daloyra.ph@gmail.com` on the Privacy and Terms pages (pull request #2).
+- [ ] Lawyer review of the Privacy Policy and Terms of Use (drafts).
+
+Note: email links expire after 1 hour; a customer who clicks later can use "Send the link again".
 
 ## Launch guide (owner steps, Phase 7)
 
