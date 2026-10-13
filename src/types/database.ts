@@ -561,6 +561,11 @@ isOneToOne: false
 "create_sale":
 { Args: { "p_business_id": string,"p_sale": Json }; Returns: string
                            },
+"get_activity":
+{ Args: { "p_before"?: string,"p_before_id"?: string,"p_business_id": string,"p_limit"?: number,"p_table"?: string }; Returns: {
+              "action": string,"actor_name": string,"amount": string,"changes": Json,"created_at": string,"id": string,"label": string,"parent_id": string,"reason": string,"record_id": string,"table_name": string
+            }[]
+                           },
 "get_amount_to_collect":
 { Args: { "p_business_id": string,"p_customer_id"?: string }; Returns: string
                            },

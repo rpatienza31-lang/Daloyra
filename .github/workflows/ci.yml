@@ -29,6 +29,11 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - name: No secret keys in the browser bundle
+        run: |
+          if grep -rqE "sb_secret_|service_role|SUPABASE_SECRET_KEY" .next/static; then
+            echo "A secret key or its name was found in client code." && exit 1
+          fi
 
   database:
     name: Database tests (RLS, tenant isolation, money rules)

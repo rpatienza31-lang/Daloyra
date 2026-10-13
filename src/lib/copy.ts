@@ -405,6 +405,157 @@ export const copy = {
       "Cash at start and end follow your Cash Balance: your starting cash plus money in, minus money out, from your starting date.",
     drillDown: (method: string) => `See ${method} transactions`,
   },
+  status: {
+    notFoundTitle: "We couldn't find that page",
+    notFoundBody:
+      "The link may be old, or the record may belong to another business. Nothing was changed.",
+    errorTitle: "Something went wrong",
+    errorBody:
+      "This page couldn't load. Your records are safe: nothing is saved unless you see a confirmation. Please try again.",
+    tryAgain: "Try again",
+    goDashboard: "Go to the dashboard",
+    goHome: "Go to the home page",
+    reference: (code: string) => `Reference code: ${code}`,
+    loading: "Loading…",
+  },
+  legal: {
+    privacy: "Privacy",
+    terms: "Terms",
+    updated: (date: string) => `Last updated ${date}`,
+    back: "Back",
+    agree: "By creating an account you agree to the",
+    and: "and the",
+    contactWithEmail: (email: string) => `Questions or requests: email ${email}.`,
+    contactNoEmail: "Questions or requests: use the contact details on the Daloyra website.",
+    // Plain-language drafts; to be reviewed by a lawyer before launch (PROGRESS.md).
+    privacyPage: {
+      title: "Privacy Policy",
+      updatedOn: "2026-10-13",
+      intro:
+        "Daloyra helps small businesses record sales, purchases, expenses and payments. This policy explains what information we keep, why, and the choices you have. We follow the Data Privacy Act of 2012 (Republic Act No. 10173).",
+      sections: [
+        {
+          heading: "What we collect",
+          bullets: [
+            "Your account: your name, email address and password (stored only in scrambled, hashed form).",
+            "Your business profile: business name, owner name, type, address, contact number, logo, currency and starting cash.",
+            "The records you enter: sales, purchases, payments, expenses, other money, and the customers and suppliers you add (for example their names, phone numbers and addresses).",
+            "Technical information needed to run the service: sign-in cookies that keep you logged in, and server logs such as your IP address and browser type.",
+          ],
+          paragraphs: ["We do not use advertising or tracking cookies."],
+        },
+        {
+          heading: "How we use it",
+          bullets: [
+            "To provide Daloyra: save your records and show your figures, reports and exports.",
+            "To keep your account secure, for example email verification and password resets.",
+            "To answer your questions when you contact us.",
+          ],
+          paragraphs: ["We never sell your information and we do not show ads."],
+        },
+        {
+          heading: "Information about your customers and suppliers",
+          paragraphs: [
+            "When you add details about other people, you decide what to record and why. Please only record what you need for your business. We keep that information on your behalf and use it only to provide Daloyra to you.",
+          ],
+        },
+        {
+          heading: "Where it is stored and how it is protected",
+          paragraphs: [
+            "Your data is stored with our service providers Supabase (database, sign-in and file storage) and Vercel (hosting), which may keep it on servers outside the Philippines. Data is encrypted while it travels and while it is stored.",
+            "Every business's records are kept separate: the database itself checks that only members of your business can read or change them. Only the people you give access to can see your records.",
+            "Our own administrators can see account information such as your name, email address, plan and how many records you have, but not your sales, customers or amounts, unless you ask us for help with them or the law requires it.",
+          ],
+        },
+        {
+          heading: "How long we keep it",
+          paragraphs: [
+            "We keep your information while your account is open. Money records are never deleted from inside the app (cancelled records stay in your history) so your books stay complete. If you close your account, we delete your business data within 90 days, except copies in backups, which are deleted when those backups expire.",
+          ],
+        },
+        {
+          heading: "Your rights",
+          bullets: [
+            "Be informed about how your information is used, and access it.",
+            "Correct information that is wrong.",
+            "Download your records at any time with the CSV export in Reports.",
+            "Ask us to delete your account and data, or object to how it is used.",
+            "Complain to the National Privacy Commission (privacy.gov.ph) if you believe your rights were not respected.",
+          ],
+        },
+        {
+          heading: "Changes",
+          paragraphs: [
+            "If we change this policy, we will update the date above and tell you in the app or by email when the change is important.",
+          ],
+        },
+      ],
+    },
+    termsPage: {
+      title: "Terms of Use",
+      updatedOn: "2026-10-13",
+      intro:
+        "These terms are the agreement between you and Daloyra when you use the app. Please read them; by creating an account you accept them.",
+      sections: [
+        {
+          heading: "Your account",
+          paragraphs: [
+            "You must give a real email address and keep your password private. You are responsible for what is done with your account and for the people you give access to. Tell us right away if you think someone else has used it.",
+          ],
+        },
+        {
+          heading: "Your data belongs to you",
+          paragraphs: [
+            "You own the records you enter. You can download them at any time as CSV files. We only use them to provide Daloyra to you, as described in the Privacy Policy.",
+          ],
+        },
+        {
+          heading: "Fair use",
+          bullets: [
+            "Use Daloyra only for lawful business purposes.",
+            "Do not try to access other businesses' data, break the security of the service, or overload it.",
+            "Do not record information you have no right to keep.",
+          ],
+        },
+        {
+          heading: "Trial and plans",
+          paragraphs: [
+            "New accounts start with a free trial. Paid plans, their prices and limits will be shown before you are asked to pay. If a subscription is not paid, we may pause the account; your records are kept and you can still download them.",
+          ],
+        },
+        {
+          heading: "Figures and advice",
+          paragraphs: [
+            "Daloyra calculates your figures from what you record, so they are only as complete as your entries. It is a tool to run your business, not tax, legal or accounting advice. Daloyra is not a BIR-registered computerized accounting system and does not issue official receipts or invoices; check your tax obligations with an accountant.",
+          ],
+        },
+        {
+          heading: "Availability",
+          paragraphs: [
+            "We work to keep Daloyra running and your data backed up, but the service may sometimes be unavailable for maintenance or reasons outside our control. We may improve or change features over time.",
+          ],
+        },
+        {
+          heading: "Limits of our responsibility",
+          paragraphs: [
+            "To the extent the law allows, Daloyra is not liable for indirect losses such as lost profits, and our total liability is limited to the fees you paid us in the 12 months before the claim. Nothing in these terms limits rights you have under Philippine consumer law.",
+          ],
+        },
+        {
+          heading: "Ending the agreement",
+          paragraphs: [
+            "You can stop using Daloyra and ask us to close your account at any time. We may suspend or close accounts that break these terms, after telling you when we reasonably can.",
+          ],
+        },
+        {
+          heading: "Changes and governing law",
+          paragraphs: [
+            "We may update these terms and will tell you about important changes in advance. These terms are governed by the laws of the Republic of the Philippines.",
+          ],
+        },
+      ],
+    },
+  },
   nav: {
     groups: {
       overview: "Overview",
@@ -506,7 +657,85 @@ export const copy = {
   },
   settings: {
     title: "Settings",
-    tabs: { business: "Business", categories: "Categories", account: "Account" },
+    tabs: {
+      business: "Business",
+      categories: "Categories",
+      account: "Account",
+      activity: "Activity",
+    },
+    activity: {
+      title: "Activity",
+      subtitle:
+        "Every sale, purchase, payment, expense and other money that was added, changed or cancelled, and who did it. Nothing here can be edited or deleted.",
+      empty: "Nothing has been recorded yet.",
+      emptyFiltered: "No activity of this kind yet.",
+      older: "Show older",
+      newest: "Back to newest",
+      filter: "Show",
+      kinds: {
+        all: "Everything",
+        sales: "Sales",
+        purchases: "Purchases",
+        customer_payments: "Payments received",
+        supplier_payments: "Payments made",
+        expenses: "Expenses",
+        cash_adjustments: "Other money",
+        businesses: "Business settings",
+      },
+      entryKinds: {
+        sales: "Sale",
+        purchases: "Purchase",
+        customer_payments: "Payment received",
+        supplier_payments: "Payment made",
+        expenses: "Expense",
+        cash_adjustments: "Other money",
+        businesses: "Business settings",
+      },
+      actions: { create: "Added", update: "Changed", void: "Cancelled" },
+      by: (name: string) => `by ${name}`,
+      // No person attached: a change made by Daloyra itself (setup, support).
+      unknownPerson: "Daloyra (system)",
+      reason: (text: string) => `Reason: ${text}`,
+      changes: "What changed",
+      before: "Before",
+      after: "After",
+      empty_value: "(empty)",
+      open: "Open record",
+      fields: {
+        reference_no: "Reference no.",
+        sale_date: "Date",
+        purchase_date: "Date",
+        payment_date: "Date",
+        expense_date: "Date",
+        entry_date: "Date",
+        due_date: "Due date",
+        customer_id: "Customer",
+        supplier_id: "Supplier",
+        category_id: "Category",
+        description: "Description",
+        items: "Items",
+        total: "Total",
+        discount_amount: "Discount",
+        amount: "Amount",
+        method: "Payment method",
+        reference: "Payment reference",
+        notes: "Notes",
+        type: "Kind",
+        direction: "In or out",
+        void_reason: "Reason",
+        name: "Business name",
+        owner_name: "Owner name",
+        business_type: "Business type",
+        address: "Address",
+        contact_number: "Contact number",
+        currency_code: "Currency",
+        starting_cash_balance: "Starting cash",
+        starting_balance_date: "Starting cash date",
+        timezone: "Timezone",
+        logo_path: "Logo",
+        status: "Status",
+      } as Record<string, string>,
+    },
     business: {
       title: "Business profile",
       subtitle: "Shown at the top of the app and on your reports.",

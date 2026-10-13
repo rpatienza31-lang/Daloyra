@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LegalLinks } from "@/components/legal/legal-links";
 import { Button } from "@/components/ui/button";
 import { copy } from "@/lib/copy";
 
@@ -17,6 +18,7 @@ export default function LandingPage() {
         </Button>
       </div>
       <p className="mt-3 text-sm text-muted-foreground">{copy.landing.trialNote}</p>
+      <LegalLinks className="mt-16" />
     </main>
   );
 }

@@ -10,8 +10,8 @@
 | 3 — Sales and collecting             | Done — approved 13 Oct 2026               |
 | 4 — Purchases, expenses, other money | Done — approved 13 Oct 2026               |
 | 5 — Dashboard and history            | Done — approved 13 Oct 2026               |
-| 6 — Reports                          | Built — waiting for owner check           |
-| 7 — Hardening and launch             | Not started                               |
+| 6 — Reports                          | Done — approved 13 Oct 2026               |
+| 7 — Hardening and launch             | Built — launch steps waiting for owner    |
 
 ## Phase 0 — what exists
 
@@ -188,6 +188,92 @@
     print date at the top.
 - Tested end to end against the dev database with a temporary account (deleted afterwards).
 
+## Phase 7 — what exists
+
+- **Activity log** (`/settings/activity`, owner only): every sale, purchase, payment, expense,
+  other money and business-settings change, newest first, with who did it, the reason for a
+  cancellation, and a before/after table of each changed field (names instead of ids, amounts
+  exact). Filter by kind; "Show older" pages through it. Read-only.
+  - Database: `20261017000100_activity_log.sql` (`get_activity`, owner-only through Row Level
+    Security, plus a narrow helper that returns team members' names only to the owner) and
+    `20261017000200_activity_paging.sql` (entries saved in the same instant keep their order and
+    are never skipped between pages).
+  - Tests: `11_activity_log` (14 checks): readable changes, exact amounts, owner only, isolation,
+    paging. 320 database checks in total.
+- **Error and not-found pages**: a calm message, "Try again" and a way back, with a reference
+  code for support; a last-resort page if the whole app fails.
+- **Loading states**: a skeleton of the page appears while data loads.
+- **Privacy Policy and Terms of Use** (`/privacy`, `/terms`): plain-language drafts based on the
+  Data Privacy Act of 2012, linked from the home page, sign-in pages and the sign-up form.
+  **They must be reviewed by a lawyer before launch.** The contact email comes from
+  `NEXT_PUBLIC_SUPPORT_EMAIL`.
+- **Accessibility and mobile pass**: every page checked at 360 px with axe (WCAG 2.1 AA): no
+  sideways scrolling, no serious issues. Fixed: text contrast of green/red/amber, charts no longer
+  take keyboard focus (their table view is the accessible version), faint labels, a small link.
+  `e2e/accessibility.spec.ts` keeps checking the public pages.
+- **Security**: headers and a strict Content-Security-Policy on every response (since Phase 0,
+  re-checked); CI now fails if a secret key ever reaches browser code.
+- **Smoke test** `e2e/smoke.spec.ts`: log in → set up the business → record a sale → see it on
+  the dashboard. Runs against any site with a dedicated test account (see the launch guide).
+
+## Launch guide (owner steps, Phase 7)
+
+Do these in order. Tell me when each numbered part is done; I check it before the next one.
+
+**A. Decisions I need from you**
+
+1. The web address: keep `daloyra.vercel.app`, or a domain you own (for example `daloyra.ph`).
+2. The support email address shown on the Privacy and Terms pages.
+3. Who sends Daloyra's emails (sign-up confirmation, password reset). Recommended: **Resend**
+   (free for up to 3,000 emails a month); it needs a domain you own.
+4. Supabase **Pro** plan (US$25 a month) for the production project: needed for daily backups.
+
+**B. Production database (Supabase)**
+
+1. Go to supabase.com → sign in → **New project**.
+2. Organization: yours. Name: `daloyra-prod`. Database password: click **Generate a password**,
+   then save it in a password manager. Region: **Southeast Asia (Singapore)**. Click **Create new
+   project** and wait until it says it is ready.
+3. Upgrade to Pro: left menu **Organization settings** (or the gear at the top) → **Billing** →
+   **Change plan** → **Pro** → confirm. Daily backups (kept 7 days) switch on automatically.
+4. Send me the project's address. It is on **Project Settings** → **General** → _Reference ID_
+   (a code like `abcd…`). I then load all the database changes into it, the same way as the dev
+   project (you will be asked to approve).
+5. **Authentication** → **Sign In / Providers** → **Email**: _Confirm email_ ON. Click **Save**.
+6. **Authentication** → **URL Configuration**: _Site URL_ = your web address (step A1). Under
+   _Redirect URLs_ click **Add URL** and add `https://YOUR-ADDRESS/**`. Click **Save**.
+7. **Authentication** → **Emails** → **Templates**: make the same two changes as in the Phase 1
+   setup (Confirm signup and Reset password), then **Save**.
+
+**C. Email sender (Resend)**
+
+1. resend.com → sign up → **Domains** → **Add domain** → your domain → copy the DNS records it
+   shows into your domain provider's DNS settings → back in Resend click **Verify**.
+2. Resend → **API Keys** → **Create API key** (permission: Sending access) → copy it.
+3. Supabase (daloyra-prod) → **Authentication** → **Emails** → **SMTP Settings** → turn on
+   **Enable custom SMTP**: Sender email `no-reply@YOUR-DOMAIN`, Sender name `Daloyra`, Host
+   `smtp.resend.com`, Port `465`, Username `resend`, Password = the API key. Click **Save**.
+
+**D. Vercel (the website)**
+
+1. vercel.com → project **daloyra** → **Settings** → **Environment Variables**. For the
+   **Production** environment only, set `NEXT_PUBLIC_SUPABASE_URL` and
+   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to the values from daloyra-prod (**Project Settings** →
+   **API Keys**: the _Project URL_ and the _Publishable_ key). Leave Preview on the dev project.
+   Add `NEXT_PUBLIC_SUPPORT_EMAIL` = your support email for all environments.
+2. Custom domain (if A1 is your own domain): **Settings** → **Domains** → **Add** → follow the DNS
+   steps shown.
+3. Production branch: today Production deploys from `claude/daloyra-build-spec-dyputg`, which
+   does not have Phases 2–7. With your permission I open a pull request to bring the finished app
+   into the production branch; you merge it.
+
+**E. Final check (together)**
+
+1. Create one real account on the live site with an email you control (a dedicated test account),
+   confirm it from the email, and tell me the email and password privately so I can run the smoke
+   test against the live site. Then I cancel the ₱1.00 test sale.
+2. Have a lawyer review the Privacy Policy and Terms (they are drafts).
+
 ## Decisions (where the spec was silent or changed)
 
 | #   | Decision                                                                                                                                                       | Reason                                                                   |
@@ -241,6 +327,10 @@
 | D46 | Sales and Purchases reports list records that are not voided; "Paid" is everything paid on them so far (any date). | Same as the To Collect / To Pay pages. |
 | D47 | CSV files hold plain amounts (no ₱ sign, no thousands separator) so a spreadsheet can add them up; they start with the business name, report and period. | For the bookkeeper. |
 | D48 | Design pass (owner request, 13 Oct): each figure has a fixed color and icon everywhere: Sales teal-blue, Purchases amber, Expenses red-orange, Profit green (red when a loss), Cash brand teal, To Collect blue. The chart colors were re-checked for color blindness. Profit is the highlighted card; Profit and Loss reads as a statement with a colored bottom line. Pill-style period and filter tabs, list cards with type icons, refreshed sidebar. No calculation or data change. | Glanceable at first sight. |
+| D50 | Money In/Out and warning text colors darkened slightly from the spec values (#16A34A → #15803D, #DC2626 → #C62828, #D97706 → #B45309), with darker shades for small pills, so all text passes WCAG AA contrast. | SPEC 12 asks for WCAG AA. |
+| D51 | Activity log shows money records and business-settings changes (the audited tables); customers, suppliers and categories are not audited. Changes with no person attached show "Daloyra (system)". | SPEC 3.6 audits money records; settings affect money figures. |
+| D52 | Privacy and Terms are plain-language drafts in copy.ts for a lawyer to review; the support email comes from an environment variable. | Legal text needs professional review. |
+| D53 | The launch smoke test logs in with a dedicated, already confirmed account instead of signing up, so it does not create accounts or send emails on every run. | Repeatable against the live site. |
 | D49 | Product list with "profit per product" (owner choice, 13 Oct): products with selling and purchase prices, picked on a sale; Profit becomes sales minus the cost of the items sold. Built after launch together with inventory, because purchases must then become stock instead of a cost. | Changes the Profit rule (SPEC 3.4); spec 2.3 "Later". Extends D38. |
 
 D1–D14 were proposed to the owner and applied by default; the owner may still change any of them.

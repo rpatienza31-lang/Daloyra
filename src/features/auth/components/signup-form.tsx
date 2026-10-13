@@ -109,6 +109,17 @@ export function SignUpForm() {
       <Button type="submit" size="lg" disabled={pending}>
         {pending ? t.submitting : t.submit}
       </Button>
+      <p className="-mt-2 text-center text-xs text-muted-foreground">
+        {copy.legal.agree}{" "}
+        <Link href="/terms" className="font-medium text-primary hover:underline">
+          {copy.legal.termsPage.title}
+        </Link>{" "}
+        {copy.legal.and}{" "}
+        <Link href="/privacy" className="font-medium text-primary hover:underline">
+          {copy.legal.privacyPage.title}
+        </Link>
+        .
+      </p>
 
       <p className="text-center text-sm text-muted-foreground">
         {t.haveAccount}{" "}

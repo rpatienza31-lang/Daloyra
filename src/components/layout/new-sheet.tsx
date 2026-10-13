@@ -53,7 +53,9 @@ function Section({
 }) {
   return (
     <div className="mb-5">
-      <p className="mb-2 text-xs font-semibold tracking-wide text-text-muted uppercase">{title}</p>
+      <p className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+        {title}
+      </p>
       <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         {items.map((item) => {
           const Icon = item.icon;
@@ -62,7 +64,7 @@ function Section({
               <Icon aria-hidden className="size-6" />
               <span className="text-sm font-medium">{item.label}</span>
               {item.href ? null : (
-                <span className="text-xs text-text-muted">{copy.nav.comingSoon}</span>
+                <span className="text-xs text-muted-foreground">{copy.nav.comingSoon}</span>
               )}
             </>
           );

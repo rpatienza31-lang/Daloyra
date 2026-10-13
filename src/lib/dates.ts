@@ -106,3 +106,19 @@ export function formatDayShort(date: IsoDate, locale = "en-PH"): string {
     timeZone: "UTC",
   }).format(new Date(`${date}T00:00:00Z`));
 }
+
+/** A moment for display in the business timezone, e.g. "Oct 13, 2026, 3:45 PM". */
+export function formatDateTime(
+  iso: string,
+  timezone: string = DEFAULT_TIMEZONE,
+  locale = "en-PH",
+): string {
+  return new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: timezone,
+  }).format(new Date(iso));
+}

@@ -9,9 +9,9 @@ const badgeVariants = cva(
       variant: {
         default: "bg-secondary text-secondary-foreground",
         muted: "bg-muted text-muted-foreground",
-        success: "bg-money-in/10 text-money-in",
-        warning: "bg-warning/10 text-warning",
-        danger: "bg-money-out/10 text-money-out",
+        success: "bg-money-in/10 text-money-in-ink",
+        warning: "bg-warning/10 text-warning-ink",
+        danger: "bg-money-out/10 text-money-out-ink",
       },
     },
     defaultVariants: { variant: "default" },

@@ -19,9 +19,14 @@
   --surface-card: #ffffff;
   --border-hairline: #e4e8ee;
 
-  --money-in: #16a34a;
-  --money-out: #dc2626;
-  --warning: #d97706;
+  /* Darkened from the spec's #16a34a / #dc2626 / #d97706 so text passes WCAG AA (4.5:1). */
+  --money-in: #15803d;
+  --money-out: #c62828;
+  --warning: #b45309;
+  /* Even darker text for small labels on tinted pills. */
+  --money-in-ink: #166534;
+  --money-out-ink: #b91c1c;
+  --warning-ink: #92400e;
 
   /*
    * What each figure is about. The same color always means the same thing: on cards,
@@ -101,6 +106,9 @@
   --color-money-in: var(--money-in);
   --color-money-out: var(--money-out);
   --color-warning: var(--warning);
+  --color-money-in-ink: var(--money-in-ink);
+  --color-money-out-ink: var(--money-out-ink);
+  --color-warning-ink: var(--warning-ink);
   --color-sales: var(--sales);
   --color-sales-ink: var(--sales-ink);
   --color-sales-tint: var(--sales-tint);

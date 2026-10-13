@@ -13,6 +13,7 @@ export default async function SettingsLayout({ children }: { children: React.Rea
       : null,
     { href: "/settings/categories", label: t.categories },
     { href: "/settings/account", label: t.account },
+    can(business?.role, "auditLog.view") ? { href: "/settings/activity", label: t.activity } : null,
   ].filter((tab) => tab !== null);
 
   return (

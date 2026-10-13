@@ -426,7 +426,7 @@ function ExpenseForm({
       {canManageCategories ? (
         <Link
           href="/settings/categories"
-          className="-mt-3 self-start text-sm font-medium text-primary hover:underline"
+          className="-mt-4 inline-flex min-h-11 items-center self-start text-sm font-medium text-primary hover:underline"
         >
           {t.manageCategories}
         </Link>

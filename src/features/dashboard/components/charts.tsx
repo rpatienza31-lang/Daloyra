@@ -191,6 +191,7 @@ export function MonthlyChart({ data, currencyCode }: { data: MonthPoint[]; curre
       <div aria-hidden style={{ height: CHART_HEIGHT }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
+            accessibilityLayer={false}
             data={rows}
             barGap={2}
             barCategoryGap="20%"
@@ -269,6 +270,7 @@ export function ProfitChart({ data, currencyCode }: { data: MonthPoint[]; curren
       <div aria-hidden style={{ height: CHART_HEIGHT }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
+            accessibilityLayer={false}
             data={rows}
             barCategoryGap="25%"
             margin={{ top: 4, right: 4, left: 0, bottom: 0 }}
@@ -362,7 +364,11 @@ export function DailyChart({
       ) : (
         <div aria-hidden style={{ height: CHART_HEIGHT }}>
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={rows} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+            <AreaChart
+              accessibilityLayer={false}
+              data={rows}
+              margin={{ top: 4, right: 8, left: 0, bottom: 0 }}
+            >
               <CartesianGrid vertical={false} stroke="var(--border-hairline)" />
               <XAxis
                 dataKey="label"

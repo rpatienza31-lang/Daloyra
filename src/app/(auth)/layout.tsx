@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LegalLinks } from "@/components/legal/legal-links";
 import { copy } from "@/lib/copy";
 import { routes } from "@/lib/routes";
 
@@ -14,6 +15,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="mt-8 rounded-card border border-border bg-card p-5 shadow-soft sm:p-6">
         {children}
       </div>
+      <LegalLinks className="mt-6 self-center" />
     </main>
   );
 }
