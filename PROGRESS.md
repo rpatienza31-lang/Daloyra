@@ -226,7 +226,8 @@ Do these in order. Tell me when each numbered part is done; I check it before th
 2. The support email address shown on the Privacy and Terms pages.
 3. Who sends Daloyra's emails (sign-up confirmation, password reset). Recommended: **Resend**
    (free for up to 3,000 emails a month); it needs a domain you own.
-4. Supabase **Pro** plan (US$25 a month) for the production project: needed for daily backups.
+4. Supabase paid plan: **done**, the owner already has a Supabase subscription (13 Oct). Create
+   the production project inside that paid organization so it gets daily backups.
 
 **B. Production database (Supabase)**
 
@@ -234,8 +235,9 @@ Do these in order. Tell me when each numbered part is done; I check it before th
 2. Organization: yours. Name: `daloyra-prod`. Database password: click **Generate a password**,
    then save it in a password manager. Region: **Southeast Asia (Singapore)**. Click **Create new
    project** and wait until it says it is ready.
-3. Upgrade to Pro: left menu **Organization settings** (or the gear at the top) → **Billing** →
-   **Change plan** → **Pro** → confirm. Daily backups (kept 7 days) switch on automatically.
+3. Check backups: left menu **Database** → **Backups**. It should list daily backups (the first
+   one appears within a day). If it says backups need a paid plan, the project was created in a
+   free organization: tell me and we fix it.
 4. Send me the project's address. It is on **Project Settings** → **General** → _Reference ID_
    (a code like `abcd…`). I then load all the database changes into it, the same way as the dev
    project (you will be asked to approve).
