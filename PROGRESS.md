@@ -337,13 +337,17 @@ Do these in order. Tell me when each numbered part is done; I check it before th
 | D51 | Activity log shows money records and business-settings changes (the audited tables); customers, suppliers and categories are not audited. Changes with no person attached show "Daloyra (system)". | SPEC 3.6 audits money records; settings affect money figures. |
 | D52 | Privacy and Terms are plain-language drafts in copy.ts for a lawyer to review; the support email comes from an environment variable. | Legal text needs professional review. |
 | D53 | The launch smoke test logs in with a dedicated, already confirmed account instead of signing up, so it does not create accounts or send emails on every run. | Repeatable against the live site. |
+| D54 | Daloyra-dev is the live database; no separate production or test project. A second project would cost about US$10 a month, and the account's 2 free projects are used elsewhere. Safeguards: database tests run on a private copy first, database changes only with the owner's approval, live checks use temporary accounts that are deleted, preview links use the live database (try them with a test account). | Owner decision, 13 Oct (cost). |
 | D49 | Product list with "profit per product" (owner choice, 13 Oct): products with selling and purchase prices, picked on a sale; Profit becomes sales minus the cost of the items sold. Built after launch together with inventory, because purchases must then become stock instead of a cost. | Changes the Profit rule (SPEC 3.4); spec 2.3 "Later". Extends D38. |
 
 D1–D14 were proposed to the owner and applied by default; the owner may still change any of them.
 
 ## Environment notes
 
-- Supabase dev project ref: `rthblabylzscojupghle` (`https://rthblabylzscojupghle.supabase.co`).
+- **Live database (since 13 Oct): Supabase project _Daloyra-dev_**, ref `rthblabylzscojupghle`
+  (`https://rthblabylzscojupghle.supabase.co`), Pro organization "Daloyra" (daily backups), Tokyo
+  region. There is no separate test project (D54). Test data was wiped on 13 Oct; the owner's login
+  was kept. Emails are sent through Gmail (`daloyra.ph@gmail.com`, custom SMTP).
 - Vercel project `daloyra`: https://daloyra.vercel.app (Production currently deploys from branch `claude/daloyra-build-spec-dyputg`). Both public Supabase variables are set for all environments.
 - The cloud sandbox network blocks `api.supabase.com`, `*.supabase.co`, `api.vercel.com` and
   `ui.shadcn.com` until they are added to the environment's allowed domains.
