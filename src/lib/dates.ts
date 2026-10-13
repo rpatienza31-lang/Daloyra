@@ -63,3 +63,62 @@ export function periodRange(
 export function addDaysIso(date: IsoDate, days: number): IsoDate {
   return format(addDays(parseISO(date), days), "yyyy-MM-dd");
 }
+
+const dateFormatters = new Map<string, Intl.DateTimeFormat>();
+
+/** A calendar date for display, e.g. "Oct 12, 2026". The date is not shifted by timezones. */
+export function formatDate(date: IsoDate, locale = "en-PH"): string {
+  let formatter = dateFormatters.get(locale);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      timeZone: "UTC",
+    });
+    dateFormatters.set(locale, formatter);
+  }
+  return formatter.format(new Date(`${date}T00:00:00Z`));
+}
+
+const monthFormatters = new Map<string, Intl.DateTimeFormat>();
+
+/** A month for chart axes, e.g. "Oct" or "Oct 2026". */
+export function formatMonth(date: IsoDate, withYear = false, locale = "en-PH"): string {
+  const key = `${locale}|${withYear}`;
+  let formatter = monthFormatters.get(key);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, {
+      month: "short",
+      ...(withYear ? { year: "numeric" } : {}),
+      timeZone: "UTC",
+    });
+    monthFormatters.set(key, formatter);
+  }
+  return formatter.format(new Date(`${date}T00:00:00Z`));
+}
+
+/** A day for chart axes, e.g. "Oct 5". */
+export function formatDayShort(date: IsoDate, locale = "en-PH"): string {
+  return new Intl.DateTimeFormat(locale, {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${date}T00:00:00Z`));
+}
+
+/** A moment for display in the business timezone, e.g. "Oct 13, 2026, 3:45 PM". */
+export function formatDateTime(
+  iso: string,
+  timezone: string = DEFAULT_TIMEZONE,
+  locale = "en-PH",
+): string {
+  return new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: timezone,
+  }).format(new Date(iso));
+}

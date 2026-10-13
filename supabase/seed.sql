@@ -1,0 +1,2 @@
+-- Development seed. Plans live in migrations because every environment needs them.
+-- A hand-calculated demo dataset is added in Phase 5.

@@ -42,6 +42,9 @@ If a shortcut weakens either, don't take it.
 - Transaction dates are SQL `date` in the business timezone (default `Asia/Manila`). "Today" is
   computed server-side in that timezone (`src/lib/dates.ts`). Weeks start Monday.
 - Payment methods: one shared list in `src/lib/payment-methods.ts`, matching the DB CHECK.
+- PostgREST returns `numeric` as a JSON number, so read amounts with a `::text` cast in the select
+  (`amount:amount::text`) and pass amounts to Postgres functions as decimal strings (`text`
+  parameters validated and cast inside the function).
 
 ## Tenant isolation (SPEC §6)
 
@@ -58,7 +61,14 @@ If a shortcut weakens either, don't take it.
 - `src/lib/supabase/admin.ts` (secret key, bypasses RLS) is `server-only` and reserved for the
   Phase 8 admin area. Never use it for business data.
 - Database changes only via files in `supabase/migrations/`. Never edit the hosted DB by hand.
-- Every new table gets isolation tests in `supabase/tests/`.
+- Every new table gets isolation tests in `supabase/tests/` (pgTAP). The generic checks in
+  `00_schema_guards` and `01_tenant_isolation` cover new tables automatically; add table-specific
+  cases too. Tests run in CI (`npx supabase start` + `npx supabase test db`).
+- Grant table privileges explicitly in each migration: `revoke all … from anon, authenticated`, then
+  grant only what the policies need (column-level `update (…)` where only some columns may change).
+- Write policies use `private.my_writable_business_ids(roles)` (excludes suspended businesses);
+  read policies use `private.my_business_ids(roles)`. Postgres functions raise short message keys
+  (`business_already_exists`) that actions map to `copy.ts` text.
 
 ## Code conventions (SPEC §13)
 
@@ -72,7 +82,8 @@ If a shortcut weakens either, don't take it.
 - Design tokens are CSS variables in `src/app/globals.css`; use Tailwind token classes
   (`bg-primary`, `text-money-in`, `rounded-card` …), not raw hex.
 - Mobile first: usable at 360 px, touch targets ≥ 44 px, amount inputs use `inputMode="decimal"`.
-- Regenerate `src/types/database.ts` after every migration; never hand-edit it.
+- Regenerate `src/types/database.ts` after every migration with `npm run db:types` (set
+  `SUPABASE_DB_URL` when not using the local Supabase); never hand-edit it. CI fails if it is stale.
 - shadcn/ui components live in `src/components/ui/`. The shadcn registry is blocked in the cloud
   sandbox, so add components by writing their source when needed.
 
@@ -80,4 +91,5 @@ If a shortcut weakens either, don't take it.
 
 `npm run dev` · `npm run check` (lint + typecheck + unit tests) · `npm run build` ·
 `npm run format` · `npm run test:e2e` (in the cloud sandbox set
-`CHROMIUM_PATH=/opt/pw-browsers/chromium`).
+`CHROMIUM_PATH=/opt/pw-browsers/chromium`) · `npm run db:test` and `npm run db:types` (need a
+local Supabase, or `SUPABASE_DB_URL`).

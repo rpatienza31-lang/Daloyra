@@ -15,3 +15,7 @@ Simple accounting and business tracking for small business owners.
 ## Checks
 
 `npm run check` (lint, typecheck, unit tests) · `npm run build` · `npm run test:e2e`
+
+Database tests (Row Level Security, tenant isolation, money rules) live in `supabase/tests/` and run
+in GitHub Actions against a throwaway local Supabase (`npx supabase start`, then
+`npx supabase test db`).

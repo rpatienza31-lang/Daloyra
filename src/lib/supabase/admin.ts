@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
 import { publicEnv } from "@/lib/env";
+import type { Database } from "@/types/database";
 
 /**
  * Secret-key client that BYPASSES Row Level Security.
@@ -12,7 +13,7 @@ export function createAdminClient() {
   if (!secretKey) {
     throw new Error("SUPABASE_SECRET_KEY is not set.");
   }
-  return createClient(publicEnv.supabaseUrl, secretKey, {
+  return createClient<Database>(publicEnv.supabaseUrl, secretKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }
