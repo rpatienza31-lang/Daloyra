@@ -75,6 +75,25 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"cash_adjustments": {
+                  Row: {
+                    "amount": number,"business_id": string,"created_at": string,"created_by": string | null,"direction": string,"entry_date": string,"id": string,"method": string,"notes": string | null,"type": string,"updated_at": string,"updated_by": string | null,"void_reason": string | null,"voided_at": string | null,"voided_by": string | null
+                  }
+                  Insert: {
+                    "amount": number,"business_id": string,"created_at"?: string,"created_by"?: string | null,"direction": string,"entry_date": string,"id"?: string,"method"?: string,"notes"?: string | null,"type": string,"updated_at"?: string,"updated_by"?: string | null,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
+                  }
+                  Update: {
+                    "amount"?: number,"business_id"?: string,"created_at"?: string,"created_by"?: string | null,"direction"?: string,"entry_date"?: string,"id"?: string,"method"?: string,"notes"?: string | null,"type"?: string,"updated_at"?: string,"updated_by"?: string | null,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "cash_adjustments_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"customer_payments": {
                   Row: {
                     "amount": number,"business_id": string,"created_at": string,"created_by": string | null,"customer_id": string | null,"id": string,"method": string,"notes": string | null,"payment_date": string,"reference": string | null,"sale_id": string,"updated_at": string,"updated_by": string | null,"void_reason": string | null,"voided_at": string | null,"voided_by": string | null
@@ -150,6 +169,31 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"expenses": {
+                  Row: {
+                    "amount": number,"business_id": string,"category_id": string,"created_at": string,"created_by": string | null,"description": string | null,"expense_date": string,"id": string,"method": string,"notes": string | null,"updated_at": string,"updated_by": string | null,"void_reason": string | null,"voided_at": string | null,"voided_by": string | null
+                  }
+                  Insert: {
+                    "amount": number,"business_id": string,"category_id": string,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"expense_date": string,"id"?: string,"method"?: string,"notes"?: string | null,"updated_at"?: string,"updated_by"?: string | null,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
+                  }
+                  Update: {
+                    "amount"?: number,"business_id"?: string,"category_id"?: string,"created_at"?: string,"created_by"?: string | null,"description"?: string | null,"expense_date"?: string,"id"?: string,"method"?: string,"notes"?: string | null,"updated_at"?: string,"updated_by"?: string | null,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "expenses_business_id_category_id_fkey"
+      columns: ["business_id","category_id"]
+isOneToOne: false
+      referencedRelation: "expense_categories"
+      referencedColumns: ["business_id","id"]
+    },{
+      foreignKeyName: "expenses_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"plans": {
                   Row: {
                     "code": string,"created_at": string,"id": string,"is_active": boolean,"limits": NonNullable<Json>,"name": string,"price_monthly": number,"updated_at": string
@@ -188,6 +232,62 @@ isOneToOne: false
                   }
                   Relationships: [
                     
+                  ]
+                },"purchase_items": {
+                  Row: {
+                    "business_id": string,"created_at": string,"description": string,"id": string,"line_total": number | null,"position": number,"purchase_id": string,"quantity": number,"unit_cost": number,"updated_at": string
+                  }
+                  Insert: {
+                    "business_id": string,"created_at"?: string,"description": string,"id"?: string,"line_total"?: never,"position": number,"purchase_id": string,"quantity": number,"unit_cost": number,"updated_at"?: string
+                  }
+                  Update: {
+                    "business_id"?: string,"created_at"?: string,"description"?: string,"id"?: string,"line_total"?: never,"position"?: number,"purchase_id"?: string,"quantity"?: number,"unit_cost"?: number,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "purchase_items_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "purchase_items_business_id_purchase_id_fkey"
+      columns: ["business_id","purchase_id"]
+isOneToOne: false
+      referencedRelation: "purchases"
+      referencedColumns: ["business_id","id"]
+    },{
+      foreignKeyName: "purchase_items_business_id_purchase_id_fkey"
+      columns: ["business_id","purchase_id"]
+isOneToOne: false
+      referencedRelation: "purchases_overview"
+      referencedColumns: ["business_id","id"]
+    }
+                  ]
+                },"purchases": {
+                  Row: {
+                    "business_id": string,"created_at": string,"created_by": string | null,"discount_amount": number,"due_date": string | null,"id": string,"notes": string | null,"purchase_date": string,"reference_no": string,"subtotal": number,"supplier_id": string | null,"total": number | null,"updated_at": string,"updated_by": string | null,"void_reason": string | null,"voided_at": string | null,"voided_by": string | null
+                  }
+                  Insert: {
+                    "business_id": string,"created_at"?: string,"created_by"?: string | null,"discount_amount"?: number,"due_date"?: string | null,"id"?: string,"notes"?: string | null,"purchase_date": string,"reference_no": string,"subtotal"?: number,"supplier_id"?: string | null,"total"?: never,"updated_at"?: string,"updated_by"?: string | null,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
+                  }
+                  Update: {
+                    "business_id"?: string,"created_at"?: string,"created_by"?: string | null,"discount_amount"?: number,"due_date"?: string | null,"id"?: string,"notes"?: string | null,"purchase_date"?: string,"reference_no"?: string,"subtotal"?: number,"supplier_id"?: string | null,"total"?: never,"updated_at"?: string,"updated_by"?: string | null,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "purchases_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "purchases_business_id_supplier_id_fkey"
+      columns: ["business_id","supplier_id"]
+isOneToOne: false
+      referencedRelation: "suppliers"
+      referencedColumns: ["business_id","id"]
+    }
                   ]
                 },"sale_items": {
                   Row: {
@@ -270,6 +370,43 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"supplier_payments": {
+                  Row: {
+                    "amount": number,"business_id": string,"created_at": string,"created_by": string | null,"id": string,"method": string,"notes": string | null,"payment_date": string,"purchase_id": string,"reference": string | null,"supplier_id": string | null,"updated_at": string,"updated_by": string | null,"void_reason": string | null,"voided_at": string | null,"voided_by": string | null
+                  }
+                  Insert: {
+                    "amount": number,"business_id": string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"method"?: string,"notes"?: string | null,"payment_date": string,"purchase_id": string,"reference"?: string | null,"supplier_id"?: string | null,"updated_at"?: string,"updated_by"?: string | null,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
+                  }
+                  Update: {
+                    "amount"?: number,"business_id"?: string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"method"?: string,"notes"?: string | null,"payment_date"?: string,"purchase_id"?: string,"reference"?: string | null,"supplier_id"?: string | null,"updated_at"?: string,"updated_by"?: string | null,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "supplier_payments_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "supplier_payments_business_id_purchase_id_fkey"
+      columns: ["business_id","purchase_id"]
+isOneToOne: false
+      referencedRelation: "purchases"
+      referencedColumns: ["business_id","id"]
+    },{
+      foreignKeyName: "supplier_payments_business_id_purchase_id_fkey"
+      columns: ["business_id","purchase_id"]
+isOneToOne: false
+      referencedRelation: "purchases_overview"
+      referencedColumns: ["business_id","id"]
+    },{
+      foreignKeyName: "supplier_payments_business_id_supplier_id_fkey"
+      columns: ["business_id","supplier_id"]
+isOneToOne: false
+      referencedRelation: "suppliers"
+      referencedColumns: ["business_id","id"]
+    }
+                  ]
                 },"suppliers": {
                   Row: {
                     "address": string | null,"archived_at": string | null,"business_id": string,"created_at": string,"created_by": string | null,"email": string | null,"id": string,"name": string,"notes": string | null,"phone": string | null,"updated_at": string,"updated_by": string | null
@@ -292,7 +429,33 @@ isOneToOne: false
                 }
           }
           Views: {
-            "sales_overview": {
+            "money_movements": {
+                  Row: {
+                    "amount": number | null,"business_id": string | null,"direction": string | null,"method": string | null,"movement_date": string | null,"source": string | null,"source_id": string | null
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"purchases_overview": {
+                  Row: {
+                    "amount_paid": number | null,"balance": number | null,"business_id": string | null,"created_at": string | null,"created_by": string | null,"discount_amount": number | null,"due_date": string | null,"due_status": string | null,"id": string | null,"notes": string | null,"payment_status": string | null,"purchase_date": string | null,"reference_no": string | null,"subtotal": number | null,"supplier_id": string | null,"supplier_name": string | null,"total": number | null,"void_reason": string | null,"voided_at": string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "purchases_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "purchases_business_id_supplier_id_fkey"
+      columns: ["business_id","supplier_id"]
+isOneToOne: false
+      referencedRelation: "suppliers"
+      referencedColumns: ["business_id","id"]
+    }
+                  ]
+                },"sales_overview": {
                   Row: {
                     "amount_paid": number | null,"balance": number | null,"business_id": string | null,"created_at": string | null,"created_by": string | null,"customer_id": string | null,"customer_name": string | null,"discount_amount": number | null,"due_date": string | null,"due_status": string | null,"id": string | null,"notes": string | null,"payment_status": string | null,"reference_no": string | null,"sale_date": string | null,"subtotal": number | null,"total": number | null,"void_reason": string | null,"voided_at": string | null
                   }
@@ -317,26 +480,73 @@ isOneToOne: false
             "create_business":
 { Args: { "p_address"?: string,"p_business_id": string,"p_business_type"?: string,"p_contact_number"?: string,"p_currency_code"?: string,"p_email"?: string,"p_name": string,"p_owner_name"?: string,"p_starting_cash_balance"?: string,"p_timezone"?: string }; Returns: string
                            },
+"create_cash_adjustment":
+{ Args: { "p_business_id": string,"p_entry": Json }; Returns: string
+                           },
+"create_expense":
+{ Args: { "p_business_id": string,"p_expense": Json }; Returns: string
+                           },
+"create_purchase":
+{ Args: { "p_business_id": string,"p_purchase": Json }; Returns: string
+                           },
 "create_sale":
 { Args: { "p_business_id": string,"p_sale": Json }; Returns: string
                            },
 "get_amount_to_collect":
 { Args: { "p_business_id": string,"p_customer_id"?: string }; Returns: string
                            },
+"get_amount_to_pay":
+{ Args: { "p_business_id": string,"p_supplier_id"?: string }; Returns: string
+                           },
+"get_dashboard":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: Json
+                           },
+"get_money_by_method":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: {
+              "method": string,"money_in": string,"money_out": string,"net": string
+            }[]
+                           },
+"has_money_records":
+{ Args: { "p_business_id": string }; Returns: boolean
+                           },
 "record_customer_payment":
+{ Args: { "p_business_id": string,"p_payment": Json }; Returns: string
+                           },
+"record_supplier_payment":
 { Args: { "p_business_id": string,"p_payment": Json }; Returns: string
                            },
 "update_business_settings":
 { Args: { "p_address": string,"p_business_id": string,"p_business_type": string,"p_contact_number": string,"p_currency_code": string,"p_email": string,"p_name": string,"p_owner_name": string,"p_starting_balance_date": string,"p_starting_cash_balance": string }; Returns: undefined
                            },
+"update_cash_adjustment":
+{ Args: { "p_business_id": string,"p_entry": Json }; Returns: undefined
+                           },
+"update_expense":
+{ Args: { "p_business_id": string,"p_expense": Json }; Returns: undefined
+                           },
+"update_purchase":
+{ Args: { "p_business_id": string,"p_purchase": Json }; Returns: undefined
+                           },
 "update_sale":
 { Args: { "p_business_id": string,"p_sale": Json }; Returns: undefined
+                           },
+"void_cash_adjustment":
+{ Args: { "p_business_id": string,"p_entry_id": string,"p_reason": string }; Returns: undefined
                            },
 "void_customer_payment":
 { Args: { "p_business_id": string,"p_payment_id": string,"p_reason": string }; Returns: undefined
                            },
+"void_expense":
+{ Args: { "p_business_id": string,"p_expense_id": string,"p_reason": string }; Returns: undefined
+                           },
+"void_purchase":
+{ Args: { "p_business_id": string,"p_purchase_id": string,"p_reason": string }; Returns: undefined
+                           },
 "void_sale":
 { Args: { "p_business_id": string,"p_reason": string,"p_sale_id": string }; Returns: undefined
+                           },
+"void_supplier_payment":
+{ Args: { "p_business_id": string,"p_payment_id": string,"p_reason": string }; Returns: undefined
                            }
           }
           Enums: {

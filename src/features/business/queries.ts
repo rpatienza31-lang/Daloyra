@@ -111,3 +111,11 @@ export async function getBusinessSettings(businessId: string): Promise<BusinessS
     logoPath: data.logo_path,
   };
 }
+
+/** True once any money record exists: the currency is then locked (decision D6). */
+export async function hasMoneyRecords(businessId: string): Promise<boolean> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("has_money_records", { p_business_id: businessId });
+  if (error) throw new Error("Could not check records.", { cause: error });
+  return data === true;
+}

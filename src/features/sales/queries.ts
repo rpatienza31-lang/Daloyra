@@ -242,8 +242,8 @@ export async function listCustomerOptions(
   return data;
 }
 
-/** True once the business has any sale: the currency is then locked (decision D6). */
-export async function hasMoneyRecords(businessId: string): Promise<boolean> {
+/** True once the business has any sale (shows the first-sale empty state otherwise). */
+export async function hasAnySales(businessId: string): Promise<boolean> {
   const supabase = await createClient();
   const { count, error } = await supabase
     .from("sales")

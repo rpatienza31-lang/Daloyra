@@ -56,6 +56,8 @@ interface DataTableProps<T extends RowData> {
   renderCard: (row: T) => React.ReactNode;
   /** Makes each row (and card) a link. */
   rowHref?: (row: T) => string;
+  /** Or: makes each row (and card) a button, e.g. to open a side sheet. */
+  onRowClick?: (row: T) => void;
   getRowId: (row: T) => string;
 }
 
@@ -69,6 +71,7 @@ export function DataTable<T extends RowData>({
   searchPlaceholder,
   renderCard,
   rowHref,
+  onRowClick,
   getRowId,
 }: DataTableProps<T>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -119,7 +122,7 @@ export function DataTable<T extends RowData>({
               const body = (
                 <>
                   <div className="min-w-0 flex-1">{renderCard(row.original)}</div>
-                  {href ? (
+                  {href || onRowClick ? (
                     <ChevronRight aria-hidden className="size-5 text-muted-foreground" />
                   ) : null}
                 </>
@@ -133,6 +136,14 @@ export function DataTable<T extends RowData>({
                     >
                       {body}
                     </Link>
+                  ) : onRowClick ? (
+                    <button
+                      type="button"
+                      onClick={() => onRowClick(row.original)}
+                      className="flex min-h-11 w-full items-center gap-3 rounded-card border border-border bg-card px-4 py-3 text-left hover:bg-muted/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+                    >
+                      {body}
+                    </button>
                   ) : (
                     <div className="flex items-center gap-3 rounded-card border border-border bg-card px-4 py-3">
                       {body}
@@ -195,7 +206,7 @@ export function DataTable<T extends RowData>({
                       key={row.id}
                       className={cn(
                         "border-b border-border last:border-0",
-                        href && "hover:bg-muted/50",
+                        (href || onRowClick) && "hover:bg-muted/50",
                       )}
                     >
                       {row.getAllCells().map((cell, i) => (
@@ -207,6 +218,14 @@ export function DataTable<T extends RowData>({
                             >
                               {flexRender(cell.column.columnDef.cell, cell.getContext())}
                             </Link>
+                          ) : onRowClick && i === 0 ? (
+                            <button
+                              type="button"
+                              onClick={() => onRowClick(row.original)}
+                              className="text-left font-medium text-foreground hover:text-primary hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+                            >
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </button>
                           ) : (
                             flexRender(cell.column.columnDef.cell, cell.getContext())
                           )}

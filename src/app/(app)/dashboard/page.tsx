@@ -36,9 +36,11 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                 {t.recordSale}
               </Link>
             </Button>
-            <Button size="lg" variant="outline" disabled title={copy.nav.comingSoon}>
-              <Receipt aria-hidden />
-              {t.recordExpense}
+            <Button asChild size="lg" variant="outline">
+              <Link href="/expenses?new=1">
+                <Receipt aria-hidden />
+                {t.recordExpense}
+              </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
               <Link href="/customers?new=1">

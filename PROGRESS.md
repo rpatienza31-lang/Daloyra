@@ -7,8 +7,8 @@
 | 0 — Foundations                      | Done — live at https://daloyra.vercel.app |
 | 1 — Accounts and tenancy             | Done — approved 12 Oct 2026               |
 | 2 — App shell and people             | Done — approved 12 Oct 2026               |
-| 3 — Sales and collecting             | Built — waiting for owner check           |
-| 4 — Purchases, expenses, other money | Not started                               |
+| 3 — Sales and collecting             | Done — approved 13 Oct 2026               |
+| 4 — Purchases, expenses, other money | Built — waiting for owner check           |
 | 5 — Dashboard and history            | Not started                               |
 | 6 — Reports                          | Not started                               |
 | 7 — Hardening and launch             | Not started                               |
@@ -111,6 +111,33 @@
   sign in, setup, quick sale, multi-item unpaid sale, part payment, To Collect, refused edit,
   void.
 
+## Phase 4 — what exists
+
+- **Database**:
+  - `20261014000100_purchases.sql`: `purchases`, `purchase_items`, `supplier_payments`,
+    `purchases_overview`, `get_amount_to_pay`, and `create/update/void_purchase`,
+    `record/void_supplier_payment`: the exact mirror of sales (generated from the sales migration
+    and reviewed). Reference numbers P-0001… (separate series from sales).
+  - `20261014000200_expenses_other_money.sql`: `expenses` (category from the business's own,
+    active categories; paid when recorded) and `cash_adjustments` ("Other Money In / Out": owner
+    in/out, loan in/out, other; the type must fit the direction). Create/edit/void functions,
+    audit trigger, voided records stay voided. Currency lock now covers every money record;
+    `has_money_records`.
+  - `20261014000300_period_figures.sql`: `money_movements` view (every payment, expense and other
+    money entry), `get_dashboard(business, from, to)` (Sales, Purchases, Expenses, Profit, Money
+    In/Out, net cash flow, Sales Today, Cash Balance, Amount to Collect/Pay) and
+    `get_money_by_method(business, from, to)`. Built now so every money rule in SPEC 3 is tested
+    this phase; Phase 5 shows them on the dashboard.
+- **Database tests**: 250 checks. New: `06_purchases_money_rules`, `07_expenses_other_money`,
+  and `08_period_figures`, a hand-calculated dataset covering profit vs cash for an unpaid sale,
+  cash balance with starting cash and other money (and D3), voided records excluded, both sides
+  of a month boundary, per-method totals adding up exactly, "today" in Manila, and isolation.
+- **App**: `/purchases` (+ new, detail, edit, pay supplier, cancel), `/payables` (To Pay),
+  `/expenses` (list with category, method and voided filters; add, edit and cancel in a side
+  sheet), `/money` (Other Money In / Out with the loan-interest hint, D7). Supplier pages show what
+  you owe and the purchases. Navigation, bottom bar, "+ New" and the dashboard buttons all work.
+- Tested end to end against the dev database with a temporary account (deleted afterwards).
+
 ## Decisions (where the spec was silent or changed)
 
 | #   | Decision                                                                                                                                                       | Reason                                                                   |
@@ -151,6 +178,9 @@
 | D33 | "Paid in full" sends the word `full`; the database pays exactly the total it computed. | The app never computes a saved amount. |
 | D34 | Staff can record payments only on sales they recorded; manager and owner on any sale. | Matches D10 (staff see their own entries). |
 | D35 | Future sale dates are allowed; a due date cannot be before the sale date. | Spec silent; pre-orders exist. |
+| D36 | "Other Money" gets its own sidebar entry (under Money Out) as well as the "+ New" sheet. | Spec has a page (`/money`) but no menu place for it. |
+| D37 | The dashboard and money-by-method figures were built (and tested) in Phase 4; Phase 5 adds the series, the screens and charts. | Phase 4 must prove every rule in SPEC 3. |
+| D38 | Products, inventory and a POS-style layout come after launch (owner asked; recommended order kept). | Spec 2.3 "Later"; changes how profit is counted. |
 
 D1–D14 were proposed to the owner and applied by default; the owner may still change any of them.
 
@@ -160,6 +190,25 @@ D1–D14 were proposed to the owner and applied by default; the owner may still 
 - Vercel project `daloyra`: https://daloyra.vercel.app (Production currently deploys from branch `claude/daloyra-build-spec-dyputg`). Both public Supabase variables are set for all environments.
 - The cloud sandbox network blocks `api.supabase.com`, `*.supabase.co`, `api.vercel.com` and
   `ui.shadcn.com` until they are added to the environment's allowed domains.
+
+## Phase 4 — try it yourself
+
+Use the newest Vercel preview for branch `claude/vigilant-meitner-pidrdu`. Database changes are
+already applied to the dev project.
+
+1. **Purchase on credit:** **+** → **Purchase** → amount `2500` → **Not yet** → tap the person icon
+   and add a supplier → **Save purchase**. It shows "Purchase P-0001", Unpaid.
+2. **Pay the supplier:** **Record payment** → `1000` → **Online Bank** → save. Partially Paid,
+   balance ₱1,500.00.
+3. **More → To Pay:** the purchase, with Amount to Pay ₱1,500.00.
+4. **Expense:** **+** → **Expense** → `3500` → **Save expense**: it asks for a category. Choose
+   Rent, tap **GCash**, save. Tap the expense to edit it, then **Cancel this expense (Void)**.
+5. **Other money:** **More → Other Money** → **New entry** → Money In, "Owner put money in",
+   `5000` → save. Add a Money Out "Loan repayment": a tip reminds you to record interest as an
+   expense.
+6. **Suppliers → your supplier:** "You owe" and the purchase.
+7. On a computer, the sidebar now has Purchases, Expenses, To Pay and Other Money; only
+   Transactions and Reports say "Soon".
 
 ## Phase 3 — try it yourself
 

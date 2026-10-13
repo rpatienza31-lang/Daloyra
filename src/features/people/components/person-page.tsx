@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SaleCard } from "@/features/sales/components/sale-columns";
 import { getAmountToCollect, listCustomerSales } from "@/features/sales/queries";
+import { PurchaseCard } from "@/features/purchases/components/purchase-columns";
+import { getAmountToPay, listSupplierPurchases } from "@/features/purchases/queries";
 import { formatMoney } from "@/lib/money";
 import { getCurrentBusiness } from "@/features/business/queries";
 import { copy } from "@/lib/copy";
@@ -72,10 +74,12 @@ export async function PersonPage({ kind, id }: { kind: PersonKind; id: string })
           archived={person.archivedAt !== null}
         />
       ) : (
-        <>
-          <h2 className="mb-3 text-lg font-semibold">{t.historyTitle}</h2>
-          <EmptyState icon={History} title={t.historyTitle} body={t.historyEmpty} />
-        </>
+        <SupplierPurchases
+          businessId={business.id}
+          supplierId={person.id}
+          currencyCode={business.currencyCode}
+          archived={person.archivedAt !== null}
+        />
       )}
     </>
   );
@@ -128,6 +132,62 @@ async function CustomerSales({
                 className="block min-h-11 rounded-card border border-border bg-card px-4 py-3 hover:bg-muted/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
               >
                 <SaleCard sale={sale} currencyCode={currencyCode} />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+async function SupplierPurchases({
+  businessId,
+  supplierId,
+  currencyCode,
+  archived,
+}: {
+  businessId: string;
+  supplierId: string;
+  currencyCode: string;
+  archived: boolean;
+}) {
+  const [sales, owed] = await Promise.all([
+    listSupplierPurchases(businessId, supplierId),
+    getAmountToPay(businessId, supplierId),
+  ]);
+  const t = copy.people.supplier;
+
+  return (
+    <section aria-labelledby="supplier-purchases">
+      <div className="mb-4 rounded-card border border-border bg-card p-5 shadow-soft">
+        <p className="text-sm font-medium text-muted-foreground">{t.owes}</p>
+        <p className="mt-1 text-2xl font-semibold amount">{formatMoney(owed, currencyCode)}</p>
+      </div>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 id="supplier-purchases" className="text-lg font-semibold">
+          {t.historyTitle}
+        </h2>
+        {archived ? null : (
+          <Button asChild variant="outline">
+            <Link href={`/purchases/new?supplier=${supplierId}`}>
+              <Plus aria-hidden />
+              {copy.purchases.add}
+            </Link>
+          </Button>
+        )}
+      </div>
+      {sales.length === 0 ? (
+        <EmptyState icon={History} title={t.historyTitle} body={t.historyEmpty} />
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {sales.map((sale) => (
+            <li key={sale.id}>
+              <Link
+                href={`/purchases/${sale.id}`}
+                className="block min-h-11 rounded-card border border-border bg-card px-4 py-3 hover:bg-muted/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+              >
+                <PurchaseCard purchase={sale} currencyCode={currencyCode} />
               </Link>
             </li>
           ))}

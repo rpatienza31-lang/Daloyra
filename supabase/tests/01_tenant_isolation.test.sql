@@ -117,7 +117,8 @@ $$;
 grant execute on all functions in schema tests to anon, authenticated;
 
 -- ---------------------------------------------------------------------------
--- Setup: two users, two businesses, a logo, customer, supplier and paid sale in each
+-- Setup: two users, two businesses, each with a logo, customer, supplier, paid sale,
+-- paid purchase, expense and Other Money In entry
 -- ---------------------------------------------------------------------------
 select tests.create_user('11111111-1111-4111-8111-111111111111', 'a@example.com');
 select tests.create_user('22222222-2222-4222-8222-222222222222', 'b@example.com');
@@ -133,6 +134,15 @@ select public.create_sale('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', jsonb_build_ob
   'id', gen_random_uuid(), 'sale_date', '2026-10-01',
   'items', jsonb_build_array(jsonb_build_object('description', 'Sale of A', 'quantity', '1', 'unit_price', '100')),
   'payment', jsonb_build_object('amount', '100', 'method', 'cash')));
+select public.create_purchase('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', jsonb_build_object(
+  'id', gen_random_uuid(), 'purchase_date', '2026-10-01',
+  'items', jsonb_build_array(jsonb_build_object('description', 'Stock of A', 'quantity', '1', 'unit_cost', '40')),
+  'payment', jsonb_build_object('amount', 'full', 'method', 'cash')));
+select public.create_expense('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', jsonb_build_object(
+  'id', gen_random_uuid(), 'expense_date', '2026-10-01', 'amount', '25', 'method', 'gcash',
+  'category_id', (select id from public.expense_categories where business_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' and name = 'Rent')));
+select public.create_cash_adjustment('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', jsonb_build_object(
+  'id', gen_random_uuid(), 'entry_date', '2026-10-01', 'direction', 'in', 'type', 'owner_in', 'amount', '1000'));
 
 select tests.login_as('22222222-2222-4222-8222-222222222222');
 select public.create_business('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'Shop B', 'Ben');
@@ -144,6 +154,15 @@ select public.create_sale('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', jsonb_build_ob
   'id', gen_random_uuid(), 'sale_date', '2026-10-01',
   'items', jsonb_build_array(jsonb_build_object('description', 'Sale of B', 'quantity', '1', 'unit_price', '100')),
   'payment', jsonb_build_object('amount', '100', 'method', 'cash')));
+select public.create_purchase('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', jsonb_build_object(
+  'id', gen_random_uuid(), 'purchase_date', '2026-10-01',
+  'items', jsonb_build_array(jsonb_build_object('description', 'Stock of B', 'quantity', '1', 'unit_cost', '40')),
+  'payment', jsonb_build_object('amount', 'full', 'method', 'cash')));
+select public.create_expense('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', jsonb_build_object(
+  'id', gen_random_uuid(), 'expense_date', '2026-10-01', 'amount', '25', 'method', 'gcash',
+  'category_id', (select id from public.expense_categories where business_id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb' and name = 'Rent')));
+select public.create_cash_adjustment('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', jsonb_build_object(
+  'id', gen_random_uuid(), 'entry_date', '2026-10-01', 'direction', 'in', 'type', 'owner_in', 'amount', '1000'));
 
 select plan(27);
 

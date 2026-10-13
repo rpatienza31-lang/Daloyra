@@ -48,9 +48,10 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: n.groups.moneyOut,
     items: [
-      { href: "/purchases", label: n.purchases, icon: Truck, available: false },
-      { href: "/expenses", label: n.expenses, icon: Receipt, available: false },
-      { href: "/payables", label: n.toPay, icon: Wallet, available: false },
+      { href: "/purchases", label: n.purchases, icon: Truck, available: true },
+      { href: "/expenses", label: n.expenses, icon: Receipt, available: true },
+      { href: "/payables", label: n.toPay, icon: Wallet, available: true },
+      { href: "/money", label: n.otherMoneyNav, icon: ArrowLeftRight, available: true },
     ],
   },
   {
@@ -84,11 +85,11 @@ export interface NewItem {
 /** The "+ New" sheet (SPEC Section 12). */
 export const NEW_MONEY_ITEMS: NewItem[] = [
   { key: "sale", label: n.sale, icon: ShoppingCart, href: "/sales/new" },
-  { key: "expense", label: n.expense, icon: Receipt, href: null },
-  { key: "purchase", label: n.purchase, icon: Truck, href: null },
+  { key: "expense", label: n.expense, icon: Receipt, href: "/expenses?new=1" },
+  { key: "purchase", label: n.purchase, icon: Truck, href: "/purchases/new" },
   { key: "payment-received", label: n.paymentReceived, icon: ArrowDownLeft, href: "/receivables" },
-  { key: "payment-made", label: n.paymentMade, icon: ArrowUpRight, href: null },
-  { key: "other-money", label: n.otherMoney, icon: ArrowLeftRight, href: null },
+  { key: "payment-made", label: n.paymentMade, icon: ArrowUpRight, href: "/payables" },
+  { key: "other-money", label: n.otherMoney, icon: ArrowLeftRight, href: "/money?new=1" },
 ];
 
 export const NEW_PEOPLE_ITEMS: NewItem[] = [

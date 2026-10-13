@@ -42,8 +42,12 @@ export function BottomBar({ footer }: { footer: React.ReactNode }) {
           <NewSheet variant="fab" />
         </li>
         <li>
-          {/* Expenses arrives in Phase 4 */}
-          <BarLink label={copy.nav.expenses} icon={Receipt} />
+          <BarLink
+            href="/expenses"
+            label={copy.nav.expenses}
+            icon={Receipt}
+            active={isActive(pathname, "/expenses")}
+          />
         </li>
         <li>
           <Sheet open={moreOpen} onOpenChange={setMoreOpen}>

@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { BusinessSettingsForm } from "@/features/business/components/business-settings-form";
-import { getBusinessSettings, getCurrentBusiness, getLogoUrl } from "@/features/business/queries";
-import { hasMoneyRecords } from "@/features/sales/queries";
+import {
+  getBusinessSettings,
+  getCurrentBusiness,
+  getLogoUrl,
+  hasMoneyRecords,
+} from "@/features/business/queries";
 import { copy } from "@/lib/copy";
 import { can } from "@/lib/permissions";
 
