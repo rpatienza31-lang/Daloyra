@@ -9,8 +9,8 @@
 | 2 — App shell and people             | Done — approved 12 Oct 2026               |
 | 3 — Sales and collecting             | Done — approved 13 Oct 2026               |
 | 4 — Purchases, expenses, other money | Done — approved 13 Oct 2026               |
-| 5 — Dashboard and history            | Built — waiting for owner check           |
-| 6 — Reports                          | Not started                               |
+| 5 — Dashboard and history            | Done — approved 13 Oct 2026               |
+| 6 — Reports                          | Built — waiting for owner check           |
 | 7 — Hardening and launch             | Not started                               |
 
 ## Phase 0 — what exists
@@ -166,6 +166,28 @@
 - Tested end to end against the dev database with a temporary account and a hand-calculated
   dataset across the Sept/Oct boundary (deleted afterwards).
 
+## Phase 6 — what exists
+
+- **Database** (`20261016000100_reports.sql`, all security invoker): one function per report,
+  each returning its rows and its totals row computed in Postgres: `report_sales`,
+  `report_purchases`, `report_expenses` (by category), `report_profit_loss`, `report_cash_flow`
+  (Money In/Out by kind, cash at start and end), `report_payment_methods`, `report_to_collect`,
+  `report_to_pay`, `report_sales_by_customer`, `report_purchases_by_supplier`. Dates may be left
+  empty for "All dates".
+- **Database tests**: 306 checks. New `10_reports`: every report total equals the dashboard for
+  the same period (Sales, Purchases, Expenses, Profit, Money In/Out, net, Cash Balance, Amount to
+  Collect/Pay), across a month boundary, with voided records left out, plus isolation.
+- **App**:
+  - `/reports`: the ten reports grouped as Money In, Money Out and Summaries.
+  - `/reports/[type]`: date filter (Today, This week, This month, This year, All dates, Custom),
+    summary figures, the table with a totals row, links into each record (and, for payment
+    methods, to the matching transactions). **Download CSV** and **Print**.
+  - `/reports/[type]/export`: the CSV file, built from the same figures (exact amounts, ISO dates,
+    formula-safe text, opens correctly in Excel).
+  - Print layout: no menus or buttons; business name and logo, report title, period and the
+    print date at the top.
+- Tested end to end against the dev database with a temporary account (deleted afterwards).
+
 ## Decisions (where the spec was silent or changed)
 
 | #   | Decision                                                                                                                                                       | Reason                                                                   |
@@ -214,6 +236,10 @@
 | D41 | Staff (later) see no totals on the dashboard and only their own entries in Transactions. | SPEC 8 "own entries only". |
 | D42 | Chart colors: Sales teal, Purchases orange, Expenses violet, checked for color blindness; the brand teal is too muted to tell apart in charts. Profit uses green/red with a minus sign and the word "loss". | Accessibility (SPEC 12). |
 | D43 | Payments in Transactions open their sale or purchase; expenses and other money open in their own list. | One place to edit or cancel each record. |
+| D44 | Reports have an extra "All dates" period. To Collect and To Pay open on All dates (they filter by the sale/purchase date); the other reports open on This month. | What is owed matters regardless of when the sale was made. |
+| D45 | Cash Flow shows cash at the start and end using the Cash Balance rule (D3). The end is the period's last day or today, whichever is earlier, so This month ends with today's Cash Balance. | Matches the dashboard; future-dated entries are not cash yet. |
+| D46 | Sales and Purchases reports list records that are not voided; "Paid" is everything paid on them so far (any date). | Same as the To Collect / To Pay pages. |
+| D47 | CSV files hold plain amounts (no ₱ sign, no thousands separator) so a spreadsheet can add them up; they start with the business name, report and period. | For the bookkeeper. |
 
 D1–D14 were proposed to the owner and applied by default; the owner may still change any of them.
 
@@ -223,6 +249,24 @@ D1–D14 were proposed to the owner and applied by default; the owner may still 
 - Vercel project `daloyra`: https://daloyra.vercel.app (Production currently deploys from branch `claude/daloyra-build-spec-dyputg`). Both public Supabase variables are set for all environments.
 - The cloud sandbox network blocks `api.supabase.com`, `*.supabase.co`, `api.vercel.com` and
   `ui.shadcn.com` until they are added to the environment's allowed domains.
+
+## Phase 6 — try it yourself
+
+Use the newest Vercel preview for branch `claude/vigilant-meitner-pidrdu`. Database changes are
+already applied to the dev project.
+
+1. Open **Reports** (on a phone: **More → Reports**). You see ten reports in three groups.
+2. Open **Profit and Loss**. Compare Sales, Purchases, Expenses and Profit with the dashboard
+   for **This month**: they must be the same.
+3. Tap **This year**, then **All dates**, then **Custom** and choose two dates → **Show**.
+4. Tap **Download CSV**. Open the file in Excel or Google Sheets: the last row is the total.
+5. Tap **Print** (on a computer). The preview shows your business name and logo, the report and
+   the dates, with no menus.
+6. Open **Cash Flow**: "Cash at end" for This month equals the dashboard's Cash Balance.
+7. Open **Payment Methods** and tap **GCash**: it opens Transactions with only GCash records for
+   the same dates.
+8. Open **To Collect**: it starts on All dates and shows what customers still owe, overdue first.
+9. Open **Sales by Customer**: tap a customer's name to open their page.
 
 ## Phase 5 — try it yourself
 

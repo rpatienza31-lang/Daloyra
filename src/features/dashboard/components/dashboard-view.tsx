@@ -12,10 +12,10 @@ import { listTransactions } from "@/features/transactions/queries";
 import { transactionHref } from "@/features/transactions/schema";
 import { TransactionCard } from "@/features/transactions/components/transaction-parts";
 import { getDailySeries, getDashboard, getMoneyByMethod, getMonthlySeries } from "../queries";
-import { MAX_DAILY_DAYS, daysInRange, type SelectedPeriod } from "../schema";
+import { MAX_DAILY_DAYS, PERIODS, daysInRange, type SelectedPeriod } from "../schema";
 import { DailyChart, MonthlyChart, ProfitChart } from "./charts";
 import { MethodPanel, type MethodShare } from "./method-panel";
-import { PeriodFilter } from "./period-filter";
+import { PeriodFilter } from "@/components/period-filter";
 import { StatCard } from "./stat-card";
 
 const t = copy.app.dashboard;
@@ -102,6 +102,9 @@ export async function DashboardView({
               {t.forPeriod(periodLabel(selected))}
             </h2>
             <PeriodFilter
+              basePath="/dashboard"
+              periods={PERIODS}
+              defaultPeriod="this_month"
               key={`${selected.period}|${selected.from}|${selected.to}`}
               period={selected.period}
               from={selected.from}

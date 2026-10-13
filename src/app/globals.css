@@ -115,3 +115,19 @@
 @utility amount {
   font-variant-numeric: tabular-nums;
 }
+
+/* Printed reports (SPEC Section 10): white page, real colors, rows kept whole. */
+@media print {
+  @page {
+    margin: 12mm;
+  }
+  html,
+  body {
+    background: #ffffff;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  tr {
+    break-inside: avoid;
+  }
+}

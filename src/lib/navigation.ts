@@ -65,7 +65,7 @@ export const NAV_GROUPS: NavGroup[] = [
     label: n.groups.insights,
     items: [
       { href: "/transactions", label: n.transactions, icon: ListChecks, available: true },
-      { href: "/reports", label: n.reports, icon: BarChart3, available: false },
+      { href: "/reports", label: n.reports, icon: BarChart3, available: true },
     ],
   },
   {

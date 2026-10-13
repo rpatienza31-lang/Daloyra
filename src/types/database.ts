@@ -594,6 +594,61 @@ isOneToOne: false
 "record_supplier_payment":
 { Args: { "p_business_id": string,"p_payment": Json }; Returns: string
                            },
+"report_business":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: {
+              "address": string | null,
+"business_type": string | null,
+"contact_number": string | null,
+"created_at": string,
+"created_by": string | null,
+"currency_code": string,
+"email": string | null,
+"id": string,
+"logo_path": string | null,
+"name": string,
+"owner_name": string | null,
+"starting_balance_date": string,
+"starting_cash_balance": number,
+"status": string,
+"timezone": string,
+"updated_at": string
+            }
+                          SetofOptions: {
+        from: "*"
+        to: "businesses"
+        isOneToOne: true
+        isSetofReturn: false
+      } },
+"report_cash_flow":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: Json
+                           },
+"report_expenses":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: Json
+                           },
+"report_payment_methods":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: Json
+                           },
+"report_profit_loss":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: Json
+                           },
+"report_purchases":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: Json
+                           },
+"report_purchases_by_supplier":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: Json
+                           },
+"report_sales":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: Json
+                           },
+"report_sales_by_customer":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: Json
+                           },
+"report_to_collect":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: Json
+                           },
+"report_to_pay":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: Json
+                           },
 "update_business_settings":
 { Args: { "p_address": string,"p_business_id": string,"p_business_type": string,"p_contact_number": string,"p_currency_code": string,"p_email": string,"p_name": string,"p_owner_name": string,"p_starting_balance_date": string,"p_starting_cash_balance": string }; Returns: undefined
                            },

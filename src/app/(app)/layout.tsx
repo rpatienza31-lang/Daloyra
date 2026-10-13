@@ -42,7 +42,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-full flex-1">
-      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-border bg-card md:flex">
+      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-border bg-card md:flex print:hidden">
         <div className="flex h-16 items-center px-4">
           <span className="font-heading text-lg font-bold text-primary">{copy.brand.name}</span>
         </div>
@@ -54,18 +54,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col md:pl-60">
-        <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
-          <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 px-4 md:px-8">
+      <div className="flex min-w-0 flex-1 flex-col md:pl-60 print:pl-0">
+        <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur print:static print:border-0 print:bg-transparent">
+          <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 px-4 md:px-8 print:max-w-none print:px-0">
             {brand}
             {suspended ? null : (
-              <div className="hidden md:block">
+              <div className="hidden md:block print:hidden">
                 <NewSheet variant="button" />
               </div>
             )}
           </div>
         </header>
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-6 pb-28 md:px-8 md:pt-8 md:pb-10">
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-6 pb-28 md:px-8 md:pt-8 md:pb-10 print:max-w-none print:p-0">
           {suspended ? (
             <div role="alert" className="rounded-card border border-destructive/30 bg-card p-6">
               <h1 className="text-xl font-bold">{copy.app.suspended.title}</h1>
@@ -77,7 +77,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </main>
       </div>
 
-      <BottomBar footer={<LogoutButton />} />
+      <div className="print:hidden">
+        <BottomBar footer={<LogoutButton />} />
+      </div>
       <Toaster />
     </div>
   );
