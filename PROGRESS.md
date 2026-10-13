@@ -220,14 +220,15 @@
 
 Do these in order. Tell me when each numbered part is done; I check it before the next one.
 
-**A. Decisions I need from you**
+**A. Decisions (answered 13 Oct)**
 
-1. The web address: keep `daloyra.vercel.app`, or a domain you own (for example `daloyra.ph`).
-2. The support email address shown on the Privacy and Terms pages.
-3. Who sends Daloyra's emails (sign-up confirmation, password reset). Recommended: **Resend**
-   (free for up to 3,000 emails a month); it needs a domain you own.
-4. Supabase paid plan: **done**, the owner already has a Supabase subscription (13 Oct). Create
-   the production project inside that paid organization so it gets daily backups.
+1. Web address: keep `daloyra.vercel.app` (no domain to buy).
+2. Support email: `daloyra.ph@gmail.com` (shown on the Privacy and Terms pages; already in the app).
+3. Email sender: Gmail (`daloyra.ph@gmail.com`), because it needs no domain. Gmail sends up to about
+   500 emails a day, plenty for launch. Later, with a domain of your own, switch to a sender such
+   as Resend so emails come from `no-reply@your-domain`.
+4. Supabase paid plan: **done**, the owner already has a Supabase subscription. Create the
+   production project inside that paid organization so it gets daily backups.
 
 **B. Production database (Supabase)**
 
@@ -247,27 +248,30 @@ Do these in order. Tell me when each numbered part is done; I check it before th
 7. **Authentication** → **Emails** → **Templates**: make the same two changes as in the Phase 1
    setup (Confirm signup and Reset password), then **Save**.
 
-**C. Email sender (Resend)**
+**C. Email sender (Gmail)**
 
-1. resend.com → sign up → **Domains** → **Add domain** → your domain → copy the DNS records it
-   shows into your domain provider's DNS settings → back in Resend click **Verify**.
-2. Resend → **API Keys** → **Create API key** (permission: Sending access) → copy it.
-3. Supabase (daloyra-prod) → **Authentication** → **Emails** → **SMTP Settings** → turn on
-   **Enable custom SMTP**: Sender email `no-reply@YOUR-DOMAIN`, Sender name `Daloyra`, Host
-   `smtp.resend.com`, Port `465`, Username `resend`, Password = the API key. Click **Save**.
+1. Sign in to Google as `daloyra.ph@gmail.com` → open myaccount.google.com → **Security**.
+2. Turn on **2-Step Verification** if it is off (Google asks for your phone).
+3. In the search box at the top of the Google Account page type **App passwords** and open it.
+   App name: `Daloyra Supabase` → **Create**. Google shows a 16-letter password once: copy it.
+   Do not send it to anyone, including me.
+4. Supabase (daloyra-prod) → **Authentication** → **Emails** → **SMTP Settings** → turn on
+   **Enable custom SMTP** and fill in: Sender email `daloyra.ph@gmail.com`, Sender name
+   `Daloyra`, Host `smtp.gmail.com`, Port `465`, Username `daloyra.ph@gmail.com`, Password = the
+   16-letter app password (no spaces). Click **Save**.
 
 **D. Vercel (the website)**
 
-1. vercel.com → project **daloyra** → **Settings** → **Environment Variables**. For the
-   **Production** environment only, set `NEXT_PUBLIC_SUPABASE_URL` and
-   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to the values from daloyra-prod (**Project Settings** →
-   **API Keys**: the _Project URL_ and the _Publishable_ key). Leave Preview on the dev project.
-   Add `NEXT_PUBLIC_SUPPORT_EMAIL` = your support email for all environments.
-2. Custom domain (if A1 is your own domain): **Settings** → **Domains** → **Add** → follow the DNS
-   steps shown.
-3. Production branch: today Production deploys from `claude/daloyra-build-spec-dyputg`, which
-   does not have Phases 2–7. With your permission I open a pull request to bring the finished app
-   into the production branch; you merge it.
+1. vercel.com → project **daloyra** → **Settings** → **Environment Variables**. Click the
+   `NEXT_PUBLIC_SUPABASE_URL` row → **Edit**: untick **Preview** and **Development**, keep
+   **Production**, and paste the daloyra-prod _Project URL_. Do the same for
+   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` with the daloyra-prod _Publishable_ key. Both values are
+   in Supabase (daloyra-prod) → **Project Settings** → **API Keys**. Never use a key that starts
+   with `sb_secret_`.
+2. Click **Add New** twice to add the same two names again for **Preview** and **Development**
+   with the dev project values, so previews keep using the test database.
+3. **Deployments** → newest Production deployment → **⋯** → **Redeploy**.
+4. Done before: the finished app is in the production branch (pull request #1, merged 13 Oct).
 
 **E. Final check (together)**
 

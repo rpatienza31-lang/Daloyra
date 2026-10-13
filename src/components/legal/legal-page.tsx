@@ -1,4 +1,4 @@
-import { copy } from "@/lib/copy";
+import { SUPPORT_EMAIL, copy } from "@/lib/copy";
 import { formatDate } from "@/lib/dates";
 
 interface LegalSection {
@@ -13,7 +13,7 @@ export function LegalPage({
 }: {
   page: { title: string; updatedOn: string; intro: string; sections: readonly LegalSection[] };
 }) {
-  const email = process.env.NEXT_PUBLIC_SUPPORT_EMAIL;
+  const email = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || SUPPORT_EMAIL;
   const t = copy.legal;
   return (
     <article className="flex flex-col gap-8">
