@@ -8,7 +8,7 @@ export function NavGroups({ onNavigate }: { onNavigate?: () => void }) {
     <div className="flex flex-col gap-5">
       {NAV_GROUPS.map((group) => (
         <div key={group.label}>
-          <p className="mb-1 px-3 text-xs font-semibold tracking-wide text-text-muted uppercase">
+          <p className="mb-1.5 px-3 text-[11px] font-semibold tracking-wider text-text-muted uppercase">
             {group.label}
           </p>
           <ul className="flex flex-col gap-0.5">

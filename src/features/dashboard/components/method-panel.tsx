@@ -56,7 +56,7 @@ export function MethodPanel({
         <div
           role="radiogroup"
           aria-label={t.toggle}
-          className="inline-flex self-start rounded-control border border-border bg-card p-1"
+          className="inline-flex gap-0.5 self-start rounded-full bg-muted p-1 ring-1 ring-border/60 ring-inset"
         >
           {(["in", "out"] as const).map((d) => (
             <button
@@ -66,9 +66,9 @@ export function MethodPanel({
               aria-checked={direction === d}
               onClick={() => setDirection(d)}
               className={cn(
-                "inline-flex min-h-11 items-center rounded-[8px] px-3 text-sm font-medium focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none sm:min-h-9",
+                "inline-flex min-h-11 items-center rounded-full px-3.5 text-sm font-medium focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none sm:min-h-9",
                 direction === d
-                  ? "bg-secondary text-secondary-foreground"
+                  ? "bg-card font-semibold text-primary shadow-soft"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >

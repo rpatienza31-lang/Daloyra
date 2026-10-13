@@ -44,7 +44,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="flex min-h-full flex-1">
       <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-border bg-card md:flex print:hidden">
         <div className="flex h-16 items-center px-4">
-          <span className="font-heading text-lg font-bold text-primary">{copy.brand.name}</span>
+          <span className="flex items-center gap-2.5">
+            <span
+              aria-hidden
+              className="flex size-8 items-center justify-center rounded-[10px] bg-gradient-to-br from-primary to-sales font-heading text-base font-bold text-white shadow-soft"
+            >
+              D
+            </span>
+            <span className="font-heading text-lg font-bold tracking-tight text-foreground">
+              {copy.brand.name}
+            </span>
+          </span>
         </div>
         <nav aria-label={copy.nav.mainNav} className="flex-1 overflow-y-auto px-3 py-2">
           <NavGroups />

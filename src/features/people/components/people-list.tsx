@@ -49,7 +49,7 @@ export function PeopleList({ kind, people, showArchived, canAdd, startAdding }: 
 
       <nav
         aria-label={t.title}
-        className="mb-4 inline-flex rounded-control border border-border bg-card p-1"
+        className="mb-4 inline-flex gap-0.5 rounded-full bg-muted p-1 ring-1 ring-border/60 ring-inset"
       >
         {[
           { label: copy.common.active, href: base, selected: !showArchived },
@@ -60,9 +60,9 @@ export function PeopleList({ kind, people, showArchived, canAdd, startAdding }: 
             href={tab.href}
             aria-current={tab.selected ? "page" : undefined}
             className={cn(
-              "inline-flex min-h-9 items-center rounded-[8px] px-4 text-sm font-medium",
+              "inline-flex min-h-9 items-center rounded-full px-4 text-sm font-medium",
               tab.selected
-                ? "bg-secondary text-secondary-foreground"
+                ? "bg-card font-semibold text-primary shadow-soft"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >

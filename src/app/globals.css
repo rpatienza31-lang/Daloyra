@@ -15,22 +15,45 @@
   --text-secondary: #475569;
   --text-muted: #94a3b8;
 
-  --surface-page: #f7f8fa;
+  --surface-page: #f4f6f9;
   --surface-card: #ffffff;
-  --border-hairline: #e5e7eb;
+  --border-hairline: #e4e8ee;
 
   --money-in: #16a34a;
   --money-out: #dc2626;
   --warning: #d97706;
 
-  /* Chart series (identity colors, validated for color-vision deficiency on white) */
-  --chart-sales: #0d9488;
-  --chart-purchases: #eb6834;
-  --chart-expenses: #6250d6;
+  /*
+   * What each figure is about. The same color always means the same thing: on cards,
+   * report rows and charts. Marks use the base color; text and icons use the darker
+   * "ink" (readable on white); backgrounds use the "tint".
+   * Sales / purchases / expenses were validated together for color-vision deficiency.
+   */
+  --sales: #0891b2;
+  --sales-ink: #0e7490;
+  --sales-tint: #e7f6fa;
+  --purchases: #e8a10b;
+  --purchases-ink: #b45309;
+  --purchases-tint: #fdf5e4;
+  --expenses: #dc4b2a;
+  --expenses-ink: #c2410c;
+  --expenses-tint: #fdeee9;
+  --profit-tint: #e9f7ef;
+  --loss-tint: #fdeded;
+  --cash: var(--brand);
+  --cash-tint: var(--brand-tint);
+  --collect: #2563eb;
+  --collect-tint: #eaf1fe;
+
+  /* Chart series */
+  --chart-sales: var(--sales);
+  --chart-purchases: var(--purchases);
+  --chart-expenses: var(--expenses);
 
   --radius-card: 16px;
   --radius-control: 10px;
-  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 4px 16px rgb(15 23 42 / 0.04);
+  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 6px 20px -8px rgb(15 23 42 / 0.08);
+  --shadow-lift: 0 2px 4px rgb(15 23 42 / 0.05), 0 12px 28px -10px rgb(15 23 42 / 0.16);
 
   /* shadcn/ui semantic tokens */
   --background: var(--surface-page);
@@ -78,6 +101,21 @@
   --color-money-in: var(--money-in);
   --color-money-out: var(--money-out);
   --color-warning: var(--warning);
+  --color-sales: var(--sales);
+  --color-sales-ink: var(--sales-ink);
+  --color-sales-tint: var(--sales-tint);
+  --color-purchases: var(--purchases);
+  --color-purchases-ink: var(--purchases-ink);
+  --color-purchases-tint: var(--purchases-tint);
+  --color-expenses: var(--expenses);
+  --color-expenses-ink: var(--expenses-ink);
+  --color-expenses-tint: var(--expenses-tint);
+  --color-profit-tint: var(--profit-tint);
+  --color-loss-tint: var(--loss-tint);
+  --color-cash: var(--cash);
+  --color-cash-tint: var(--cash-tint);
+  --color-collect: var(--collect);
+  --color-collect-tint: var(--collect-tint);
   --color-chart-sales: var(--chart-sales);
   --color-chart-purchases: var(--chart-purchases);
   --color-chart-expenses: var(--chart-expenses);
@@ -91,6 +129,7 @@
   --radius-xl: var(--radius-card);
 
   --shadow-soft: var(--shadow-soft);
+  --shadow-lift: var(--shadow-lift);
 
   --font-sans: var(--font-inter);
   --font-heading: var(--font-jakarta);

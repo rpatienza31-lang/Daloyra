@@ -16,7 +16,7 @@ import { MAX_DAILY_DAYS, PERIODS, daysInRange, type SelectedPeriod } from "../sc
 import { DailyChart, MonthlyChart, ProfitChart } from "./charts";
 import { MethodPanel, type MethodShare } from "./method-panel";
 import { PeriodFilter } from "@/components/period-filter";
-import { StatCard } from "./stat-card";
+import { StatCard } from "@/components/money/stat-card";
 
 const t = copy.app.dashboard;
 
@@ -61,7 +61,10 @@ export async function DashboardView({
       <PageHeader title={t.title} description={business.name} />
       <div className="flex flex-col gap-8">
         <section aria-labelledby="now-title" className="flex flex-col gap-3">
-          <h2 id="now-title" className="text-sm font-semibold text-muted-foreground uppercase">
+          <h2
+            id="now-title"
+            className="text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+          >
             {t.rightNow}
           </h2>
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -69,6 +72,7 @@ export async function DashboardView({
               label={c.salesToday}
               amount={figures.salesToday}
               currencyCode={currency}
+              accent="sales"
               testId="sales-today"
             />
             <StatCard
@@ -77,6 +81,7 @@ export async function DashboardView({
               currencyCode={currency}
               info={t.info.cashBalance}
               signed
+              accent="cash"
               testId="cash-balance"
             />
             <StatCard
@@ -84,6 +89,7 @@ export async function DashboardView({
               amount={figures.amountToCollect}
               currencyCode={currency}
               info={t.info.amountToCollect}
+              accent="collect"
               testId="amount-to-collect"
             />
             <StatCard
@@ -91,14 +97,18 @@ export async function DashboardView({
               amount={figures.amountToPay}
               currencyCode={currency}
               info={t.info.amountToPay}
+              accent="purchases"
               testId="amount-to-pay"
             />
           </div>
         </section>
 
         <section aria-labelledby="period-title" className="flex flex-col gap-3">
-          <div className="flex flex-col gap-3">
-            <h2 id="period-title" className="text-sm font-semibold text-muted-foreground uppercase">
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+            <h2
+              id="period-title"
+              className="text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+            >
               {t.forPeriod(periodLabel(selected))}
             </h2>
             <PeriodFilter
@@ -117,18 +127,21 @@ export async function DashboardView({
               label={c.sales}
               amount={figures.sales}
               currencyCode={currency}
+              accent="sales"
               testId="period-sales"
             />
             <StatCard
               label={c.purchases}
               amount={figures.purchases}
               currencyCode={currency}
+              accent="purchases"
               testId="period-purchases"
             />
             <StatCard
               label={c.expenses}
               amount={figures.expenses}
               currencyCode={currency}
+              accent="expenses"
               testId="period-expenses"
             />
             <StatCard
@@ -136,7 +149,9 @@ export async function DashboardView({
               amount={figures.profit}
               currencyCode={currency}
               info={t.info.profit}
+              accent="profit"
               signed
+              highlight
               testId="period-profit"
             />
           </div>
@@ -169,16 +184,16 @@ export async function DashboardView({
               </Button>
             </div>
             {recent.length === 0 ? (
-              <p className="rounded-card border border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
+              <p className="rounded-card border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
                 {t.recent.empty}
               </p>
             ) : (
-              <ul className="flex flex-col gap-2">
+              <ul className="divide-y divide-border overflow-hidden rounded-card border border-border bg-card shadow-soft">
                 {recent.map((tx) => (
                   <li key={`${tx.type}-${tx.id}`}>
                     <Link
                       href={transactionHref(tx)}
-                      className="block min-h-11 rounded-card border border-border bg-card px-4 py-3 hover:bg-muted/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+                      className="block min-h-11 px-4 py-3 transition-colors hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none"
                     >
                       <TransactionCard tx={tx} currencyCode={currency} />
                     </Link>
@@ -201,16 +216,16 @@ export async function DashboardView({
               </Button>
             </div>
             {overdue.length === 0 ? (
-              <p className="rounded-card border border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
+              <p className="rounded-card border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
                 {t.overdue.empty}
               </p>
             ) : (
-              <ul className="flex flex-col gap-2">
+              <ul className="divide-y divide-border overflow-hidden rounded-card border border-border bg-card shadow-soft">
                 {overdue.map((sale) => (
                   <li key={sale.id}>
                     <Link
                       href={`/sales/${sale.id}`}
-                      className="flex min-h-11 items-start justify-between gap-3 rounded-card border border-border bg-card px-4 py-3 hover:bg-muted/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+                      className="flex min-h-11 items-start justify-between gap-3 px-4 py-3 transition-colors hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none"
                     >
                       <div className="min-w-0">
                         <p className="truncate font-medium">
@@ -250,16 +265,16 @@ export async function StaffDashboard({ business }: { business: CurrentBusiness }
           {t.recent.title}
         </h2>
         {recent.length === 0 ? (
-          <p className="rounded-card border border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
+          <p className="rounded-card border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
             {t.recent.empty}
           </p>
         ) : (
-          <ul className="flex flex-col gap-2">
+          <ul className="divide-y divide-border overflow-hidden rounded-card border border-border bg-card shadow-soft">
             {recent.map((tx) => (
               <li key={`${tx.type}-${tx.id}`}>
                 <Link
                   href={transactionHref(tx)}
-                  className="block min-h-11 rounded-card border border-border bg-card px-4 py-3 hover:bg-muted/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+                  className="block min-h-11 px-4 py-3 transition-colors hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none"
                 >
                   <TransactionCard tx={tx} currencyCode={business.currencyCode} />
                 </Link>

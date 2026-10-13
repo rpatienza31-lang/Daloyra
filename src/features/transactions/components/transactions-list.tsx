@@ -24,6 +24,7 @@ import {
 import {
   TransactionAmount,
   TransactionCard,
+  TransactionIcon,
   TransactionStatus,
   transactionDetails,
   transactionTitle,
@@ -57,7 +58,17 @@ export function TransactionsList({
         header: t.date,
         cell: ({ row }) => formatDate(row.original.date),
       },
-      { id: "type", accessorFn: (x) => t.types[x.type], header: t.type },
+      {
+        id: "type",
+        accessorFn: (x) => t.types[x.type],
+        header: t.type,
+        cell: ({ row }) => (
+          <span className="inline-flex items-center gap-2.5 whitespace-nowrap">
+            <TransactionIcon type={row.original.type} />
+            {t.types[row.original.type]}
+          </span>
+        ),
+      },
       { id: "party", accessorFn: transactionTitle, header: t.party },
       {
         id: "details",

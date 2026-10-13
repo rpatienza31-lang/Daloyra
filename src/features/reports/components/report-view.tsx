@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { copy } from "@/lib/copy";
 import { formatDate } from "@/lib/dates";
-import { compareMoney, formatMoney } from "@/lib/money";
+import { ACCENTS } from "@/components/money/accent";
+import { StatCard } from "@/components/money/stat-card";
+import { formatMoney } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import type { ColumnKind, ReportView } from "../model";
 
@@ -20,55 +22,40 @@ const alignRight = (kind: ColumnKind) => kind === "money" || kind === "number";
 export function ReportTable({ view, currencyCode }: { view: ReportView; currencyCode: string }) {
   return (
     <div className="flex flex-col gap-4">
-      <dl
+      <div
         className={cn(
           "grid grid-cols-2 gap-3 print:grid-cols-4",
           view.summary.length >= 4 ? "lg:grid-cols-4" : "lg:grid-cols-3",
         )}
       >
-        {view.summary.map((item) => {
-          const negative = item.signed && compareMoney(item.amount, "0") < 0;
-          const positive = item.signed && compareMoney(item.amount, "0") > 0;
-          return (
-            <div
-              key={item.label}
-              className="flex min-w-0 flex-col gap-1 rounded-card border border-border bg-card p-4 shadow-soft print:shadow-none"
-            >
-              <dt className="text-xs font-medium text-muted-foreground sm:text-sm">{item.label}</dt>
-              <dd
-                className={cn(
-                  "text-lg font-semibold [overflow-wrap:anywhere] amount sm:text-xl",
-                  negative && "text-money-out",
-                  positive && "text-money-in",
-                )}
-              >
-                {formatMoney(item.amount, currencyCode)}
-                {negative ? (
-                  <span className="ml-1.5 text-xs font-medium">
-                    {copy.app.dashboard.profitLoss}
-                  </span>
-                ) : null}
-              </dd>
-            </div>
-          );
-        })}
-      </dl>
+        {view.summary.map((item) => (
+          <StatCard
+            key={item.label}
+            label={item.label}
+            amount={item.amount}
+            currencyCode={currencyCode}
+            accent={item.accent}
+            signed={item.signed}
+            highlight={item.accent === "profit"}
+          />
+        ))}
+      </div>
 
       {view.rows.length === 0 ? (
-        <p className="rounded-card border border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
+        <p className="rounded-card border border-dashed border-border bg-card px-4 py-10 text-center text-sm text-muted-foreground">
           {r.empty}
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-card border border-border bg-card print:overflow-visible print:border-0">
+        <div className="overflow-x-auto rounded-card border border-border bg-card shadow-soft print:overflow-visible print:border-0 print:shadow-none">
           <table className="w-full text-sm">
-            <thead className="border-b border-border bg-muted/50 text-left text-muted-foreground print:bg-transparent">
+            <thead className="border-b border-border bg-muted/60 text-left text-xs tracking-wide text-muted-foreground uppercase print:bg-transparent">
               <tr>
                 {view.columns.map((col) => (
                   <th
                     key={col.key}
                     scope="col"
                     className={cn(
-                      "px-4 py-3 font-medium whitespace-nowrap print:px-2 print:py-1",
+                      "px-4 py-3 font-semibold whitespace-nowrap print:px-2 print:py-1",
                       alignRight(col.kind) && "text-right",
                     )}
                   >
@@ -82,9 +69,10 @@ export function ReportTable({ view, currencyCode }: { view: ReportView; currency
                 <tr
                   key={row.key}
                   className={cn(
-                    "border-b border-border last:border-0",
-                    row.style === "heading" && "bg-muted/30 font-semibold",
+                    "border-b border-border transition-colors last:border-0",
+                    row.style === "heading" && "bg-muted/40 font-semibold",
                     row.style === "subtotal" && "font-semibold",
+                    !row.style && "hover:bg-muted/30",
                   )}
                 >
                   {view.columns.map((col, i) => {
@@ -93,12 +81,21 @@ export function ReportTable({ view, currencyCode }: { view: ReportView; currency
                       <td
                         key={col.key}
                         className={cn(
-                          "px-4 py-2.5 print:px-2 print:py-1",
+                          "px-4 py-3 print:px-2 print:py-1",
                           alignRight(col.kind) && "text-right whitespace-nowrap amount",
                           col.kind === "date" && "whitespace-nowrap",
                           i === 0 && row.indent && "pl-8 print:pl-4",
                         )}
                       >
+                        {i === 0 && row.accent ? (
+                          <span
+                            aria-hidden
+                            className={cn(
+                              "mr-2.5 inline-block size-2.5 rounded-full align-middle",
+                              ACCENTS[row.accent].dot,
+                            )}
+                          />
+                        ) : null}
                         {i === 0 && row.href ? (
                           <Link
                             href={row.href}
@@ -116,7 +113,14 @@ export function ReportTable({ view, currencyCode }: { view: ReportView; currency
               ))}
             </tbody>
             {view.totals ? (
-              <tfoot className="border-t-2 border-foreground/20 font-semibold">
+              <tfoot
+                className={cn(
+                  "border-t-2 border-foreground/15 font-bold",
+                  view.totalsTone === "profit" && "bg-profit-tint text-money-in",
+                  view.totalsTone === "loss" && "bg-loss-tint text-money-out",
+                  !view.totalsTone && "bg-muted/40",
+                )}
+              >
                 <tr>
                   {view.columns.map((col, i) => {
                     const value = view.totals?.[col.key] ?? null;
@@ -124,7 +128,8 @@ export function ReportTable({ view, currencyCode }: { view: ReportView; currency
                       <td
                         key={col.key}
                         className={cn(
-                          "px-4 py-3 print:px-2 print:py-1",
+                          "px-4 py-3.5 print:px-2 print:py-1",
+                          view.totalsTone && "text-base",
                           alignRight(col.kind) && "text-right whitespace-nowrap amount",
                           col.kind === "money" &&
                             value !== null &&

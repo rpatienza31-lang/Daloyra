@@ -1,3 +1,4 @@
+import { ACCENTS, type Accent } from "@/components/money/accent";
 import { MethodPill } from "@/components/money/method-pill";
 import { SaleStatusPill } from "@/components/money/sale-status-pill";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +7,7 @@ import { formatDate } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import type { Transaction } from "../queries";
+import type { TransactionType } from "../schema";
 
 const t = copy.transactions;
 
@@ -72,12 +74,34 @@ export function TransactionStatus({ tx }: { tx: Transaction }) {
   return tx.method ? <MethodPill method={tx.method} /> : null;
 }
 
+const TYPE_ACCENT: Record<TransactionType, Accent> = {
+  sale: "sales",
+  purchase: "purchases",
+  expense: "expenses",
+  customer_payment: "in",
+  other_in: "in",
+  supplier_payment: "out",
+  other_out: "out",
+};
+
+/** A small colored icon for the kind of record (sale, purchase, expense, money in/out). */
+export function TransactionIcon({ type }: { type: TransactionType }) {
+  const a = ACCENTS[TYPE_ACCENT[type]];
+  const Icon = a.icon;
+  return (
+    <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-xl", a.chip)}>
+      <Icon aria-hidden className="size-[18px]" />
+    </span>
+  );
+}
+
 /** A row as a stacked card (phones, dashboard). */
 export function TransactionCard({ tx, currencyCode }: { tx: Transaction; currencyCode: string }) {
   const details = transactionDetails(tx);
   return (
     <div className="flex items-start justify-between gap-3">
-      <div className="min-w-0">
+      <TransactionIcon type={tx.type} />
+      <div className="min-w-0 flex-1">
         <p className="truncate font-medium">{transactionTitle(tx)}</p>
         <p className="truncate text-sm text-muted-foreground">
           {t.types[tx.type]} · {formatDate(tx.date)}

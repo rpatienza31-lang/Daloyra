@@ -1,3 +1,4 @@
+import type { Accent } from "@/components/money/accent";
 import { copy } from "@/lib/copy";
 import { paymentMethodLabel } from "@/lib/payment-methods";
 import type { ReportData, ReportPeriod } from "./schema";
@@ -24,11 +25,14 @@ export interface ReportRow {
   style?: "heading" | "subtotal";
   /** Shown indented under a heading row. */
   indent?: boolean;
+  /** A colored dot saying what the line is about (sales, purchases, expenses). */
+  accent?: Accent;
 }
 
 export interface ReportSummaryItem {
   label: string;
   amount: string;
+  accent: Accent;
   /** Show the sign in color and words (profit / loss, net). */
   signed?: boolean;
 }
@@ -39,6 +43,8 @@ export interface ReportView {
   rows: ReportRow[];
   /** The totals row, keyed like the cells; null when the summary says it all. */
   totals: Record<string, string | null> | null;
+  /** Colors the totals row: the bottom line of a statement. */
+  totalsTone?: "profit" | "loss";
   note?: string;
 }
 
@@ -65,9 +71,9 @@ export function buildReportView(report: ReportData, period: ReportPeriod): Repor
       const sales = report.type === "sales";
       return {
         summary: [
-          { label: s.total, amount: totals.total },
-          { label: s.paid, amount: totals.paid },
-          { label: s.balance, amount: totals.balance },
+          { label: s.total, amount: totals.total, accent: sales ? "sales" : "purchases" },
+          { label: s.paid, amount: totals.paid, accent: sales ? "in" : "out" },
+          { label: s.balance, amount: totals.balance, accent: sales ? "collect" : "purchases" },
         ],
         columns: [
           { key: "date", label: c.date, kind: "date" },
@@ -102,8 +108,8 @@ export function buildReportView(report: ReportData, period: ReportPeriod): Repor
       const collect = report.type === "to-collect";
       return {
         summary: [
-          { label: s.balance, amount: totals.balance },
-          { label: s.overdue, amount: totals.overdue },
+          { label: s.balance, amount: totals.balance, accent: collect ? "collect" : "purchases" },
+          { label: s.overdue, amount: totals.overdue, accent: "loss" },
         ],
         columns: [
           { key: "date", label: c.date, kind: "date" },
@@ -139,9 +145,13 @@ export function buildReportView(report: ReportData, period: ReportPeriod): Repor
       const sales = report.type === "sales-by-customer";
       return {
         summary: [
-          { label: sales ? s.sales : s.purchases, amount: totals.total },
-          { label: s.paid, amount: totals.paid },
-          { label: s.balance, amount: totals.balance },
+          {
+            label: sales ? s.sales : s.purchases,
+            amount: totals.total,
+            accent: sales ? "sales" : "purchases",
+          },
+          { label: s.paid, amount: totals.paid, accent: sales ? "in" : "out" },
+          { label: s.balance, amount: totals.balance, accent: sales ? "collect" : "purchases" },
         ],
         columns: [
           { key: "party", label: sales ? c.customer : c.supplier, kind: "text" },
@@ -174,7 +184,7 @@ export function buildReportView(report: ReportData, period: ReportPeriod): Repor
     case "expenses": {
       const { rows, totals } = report.data;
       return {
-        summary: [{ label: s.expenses, amount: totals.amount }],
+        summary: [{ label: s.expenses, amount: totals.amount, accent: "expenses" }],
         columns: [
           { key: "category", label: c.category, kind: "text" },
           { key: "count", label: c.count, kind: "number" },
@@ -194,19 +204,28 @@ export function buildReportView(report: ReportData, period: ReportPeriod): Repor
       const l = r.lines;
       return {
         summary: [
-          { label: s.sales, amount: totals.sales },
-          { label: s.purchases, amount: totals.purchases },
-          { label: s.expenses, amount: totals.expenses },
-          { label: s.profit, amount: totals.profit, signed: true },
+          { label: s.sales, amount: totals.sales, accent: "sales" },
+          { label: s.purchases, amount: totals.purchases, accent: "purchases" },
+          { label: s.expenses, amount: totals.expenses, accent: "expenses" },
+          { label: s.profit, amount: totals.profit, accent: "profit", signed: true },
         ],
         columns: [
           { key: "line", label: c.line, kind: "text" },
           { key: "amount", label: c.amount, kind: "money" },
         ],
         rows: [
-          { key: "sales", cells: { line: l.sales, amount: totals.sales } },
-          { key: "purchases", cells: { line: l.purchases, amount: totals.purchases } },
-          { key: "expenses", style: "heading", cells: { line: l.expensesHeading, amount: null } },
+          { key: "sales", accent: "sales", cells: { line: l.sales, amount: totals.sales } },
+          {
+            key: "purchases",
+            accent: "purchases",
+            cells: { line: l.purchases, amount: totals.purchases },
+          },
+          {
+            key: "expenses",
+            style: "heading",
+            accent: "expenses",
+            cells: { line: l.expensesHeading, amount: null },
+          },
           ...rows.map((x) => ({
             key: `expense-${x.id}`,
             indent: true,
@@ -222,6 +241,7 @@ export function buildReportView(report: ReportData, period: ReportPeriod): Repor
           line: totals.profit.startsWith("-") ? l.loss : l.profit,
           amount: totals.profit,
         },
+        totalsTone: totals.profit.startsWith("-") ? "loss" : "profit",
       };
     }
 
@@ -246,10 +266,18 @@ export function buildReportView(report: ReportData, period: ReportPeriod): Repor
           }));
       return {
         summary: [
-          { label: s.opening(formatIso(totals.opening_date)), amount: totals.opening },
-          { label: s.moneyIn, amount: totals.money_in },
-          { label: s.moneyOut, amount: totals.money_out },
-          { label: s.closing(formatIso(totals.closing_date)), amount: totals.closing },
+          {
+            label: s.opening(formatIso(totals.opening_date)),
+            amount: totals.opening,
+            accent: "cash",
+          },
+          { label: s.moneyIn, amount: totals.money_in, accent: "in" },
+          { label: s.moneyOut, amount: totals.money_out, accent: "out" },
+          {
+            label: s.closing(formatIso(totals.closing_date)),
+            amount: totals.closing,
+            accent: "cash",
+          },
         ],
         columns: [
           { key: "line", label: c.line, kind: "text" },
@@ -257,9 +285,9 @@ export function buildReportView(report: ReportData, period: ReportPeriod): Repor
           { key: "moneyOut", label: c.moneyOut, kind: "money" },
         ],
         rows: [
-          { key: "in", style: "heading", cells: { line: s.moneyIn } },
+          { key: "in", style: "heading", accent: "in", cells: { line: s.moneyIn } },
           ...lineRows("in"),
-          { key: "out", style: "heading", cells: { line: s.moneyOut } },
+          { key: "out", style: "heading", accent: "out", cells: { line: s.moneyOut } },
           ...lineRows("out"),
         ],
         totals: { line: r.total, moneyIn: totals.money_in, moneyOut: totals.money_out },
@@ -271,9 +299,9 @@ export function buildReportView(report: ReportData, period: ReportPeriod): Repor
       const { rows, totals } = report.data;
       return {
         summary: [
-          { label: s.moneyIn, amount: totals.money_in },
-          { label: s.moneyOut, amount: totals.money_out },
-          { label: s.net, amount: totals.net, signed: true },
+          { label: s.moneyIn, amount: totals.money_in, accent: "in" },
+          { label: s.moneyOut, amount: totals.money_out, accent: "out" },
+          { label: s.net, amount: totals.net, accent: "cash", signed: true },
         ],
         columns: [
           { key: "method", label: c.method, kind: "text" },

@@ -77,16 +77,16 @@ export function PurchasesList({
       <PageHeader title={s.title} actions={newButton} />
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <nav aria-label={s.title} className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-          <div className="inline-flex rounded-control border border-border bg-card p-1">
+          <div className="inline-flex gap-0.5 rounded-full bg-muted p-1 ring-1 ring-border/60 ring-inset">
             {FILTERS.map((f) => (
               <Link
                 key={f.key}
                 href={hrefWith("status", f.key)}
                 aria-current={filter === f.key ? "page" : undefined}
                 className={cn(
-                  "inline-flex min-h-9 items-center rounded-[8px] px-3 text-sm font-medium whitespace-nowrap",
+                  "inline-flex min-h-9 items-center rounded-full px-3.5 text-sm font-medium whitespace-nowrap",
                   filter === f.key
-                    ? "bg-secondary text-secondary-foreground"
+                    ? "bg-card font-semibold text-primary shadow-soft"
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >

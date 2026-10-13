@@ -33,12 +33,13 @@ export function NavLink({ item, onNavigate }: { item: NavItem; onNavigate?: () =
       className={cn(
         base,
         "focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none",
+        "relative",
         active
-          ? "bg-secondary text-secondary-foreground"
+          ? "bg-secondary font-semibold text-primary before:absolute before:inset-y-2 before:-left-3 before:w-1 before:rounded-r-full before:bg-primary"
           : "text-muted-foreground hover:bg-muted hover:text-foreground",
       )}
     >
-      <Icon aria-hidden className="size-5" />
+      <Icon aria-hidden className={cn("size-5", active ? "text-primary" : "text-text-muted")} />
       {item.label}
     </Link>
   );

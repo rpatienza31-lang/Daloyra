@@ -240,6 +240,7 @@
 | D45 | Cash Flow shows cash at the start and end using the Cash Balance rule (D3). The end is the period's last day or today, whichever is earlier, so This month ends with today's Cash Balance. | Matches the dashboard; future-dated entries are not cash yet. |
 | D46 | Sales and Purchases reports list records that are not voided; "Paid" is everything paid on them so far (any date). | Same as the To Collect / To Pay pages. |
 | D47 | CSV files hold plain amounts (no ₱ sign, no thousands separator) so a spreadsheet can add them up; they start with the business name, report and period. | For the bookkeeper. |
+| D48 | Design pass (owner request, 13 Oct): each figure has a fixed color and icon everywhere: Sales teal-blue, Purchases amber, Expenses red-orange, Profit green (red when a loss), Cash brand teal, To Collect blue. The chart colors were re-checked for color blindness. Profit is the highlighted card; Profit and Loss reads as a statement with a colored bottom line. Pill-style period and filter tabs, list cards with type icons, refreshed sidebar. No calculation or data change. | Glanceable at first sight. |
 
 D1–D14 were proposed to the owner and applied by default; the owner may still change any of them.
 

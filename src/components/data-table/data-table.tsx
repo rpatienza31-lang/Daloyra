@@ -110,7 +110,7 @@ export function DataTable<T extends RowData>({
       ) : null}
 
       {rows.length === 0 ? (
-        <p className="rounded-card border border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
+        <p className="rounded-card border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
           {copy.common.noMatches}
         </p>
       ) : (
@@ -132,7 +132,7 @@ export function DataTable<T extends RowData>({
                   {href ? (
                     <Link
                       href={href}
-                      className="flex min-h-11 items-center gap-3 rounded-card border border-border bg-card px-4 py-3 hover:bg-muted/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+                      className="flex min-h-11 items-center gap-3 rounded-card border border-border bg-card px-4 py-3 shadow-soft transition-shadow hover:shadow-lift focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                     >
                       {body}
                     </Link>
@@ -140,7 +140,7 @@ export function DataTable<T extends RowData>({
                     <button
                       type="button"
                       onClick={() => onRowClick(row.original)}
-                      className="flex min-h-11 w-full items-center gap-3 rounded-card border border-border bg-card px-4 py-3 text-left hover:bg-muted/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+                      className="flex min-h-11 w-full items-center gap-3 rounded-card border border-border bg-card px-4 py-3 text-left shadow-soft transition-shadow hover:shadow-lift focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                     >
                       {body}
                     </button>
@@ -155,9 +155,9 @@ export function DataTable<T extends RowData>({
           </ul>
 
           {/* Tablets and up: a table */}
-          <div className="hidden overflow-hidden rounded-card border border-border bg-card md:block">
+          <div className="hidden overflow-hidden rounded-card border border-border bg-card shadow-soft md:block">
             <table className="w-full text-sm">
-              <thead className="border-b border-border bg-muted/50 text-left text-muted-foreground">
+              <thead className="border-b border-border bg-muted/60 text-left text-xs tracking-wide text-muted-foreground uppercase">
                 {table.getHeaderGroups().map((group) => (
                   <tr key={group.id}>
                     {group.headers.map((header) => {
@@ -205,12 +205,12 @@ export function DataTable<T extends RowData>({
                     <tr
                       key={row.id}
                       className={cn(
-                        "border-b border-border last:border-0",
-                        (href || onRowClick) && "hover:bg-muted/50",
+                        "border-b border-border transition-colors last:border-0",
+                        (href || onRowClick) && "hover:bg-muted/40",
                       )}
                     >
                       {row.getAllCells().map((cell, i) => (
-                        <td key={cell.id} className="px-4 py-3">
+                        <td key={cell.id} className="px-4 py-3.5 align-middle">
                           {href && i === 0 ? (
                             <Link
                               href={href}
