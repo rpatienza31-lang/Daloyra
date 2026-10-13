@@ -241,6 +241,7 @@
 | D46 | Sales and Purchases reports list records that are not voided; "Paid" is everything paid on them so far (any date). | Same as the To Collect / To Pay pages. |
 | D47 | CSV files hold plain amounts (no ₱ sign, no thousands separator) so a spreadsheet can add them up; they start with the business name, report and period. | For the bookkeeper. |
 | D48 | Design pass (owner request, 13 Oct): each figure has a fixed color and icon everywhere: Sales teal-blue, Purchases amber, Expenses red-orange, Profit green (red when a loss), Cash brand teal, To Collect blue. The chart colors were re-checked for color blindness. Profit is the highlighted card; Profit and Loss reads as a statement with a colored bottom line. Pill-style period and filter tabs, list cards with type icons, refreshed sidebar. No calculation or data change. | Glanceable at first sight. |
+| D49 | Product list with "profit per product" (owner choice, 13 Oct): products with selling and purchase prices, picked on a sale; Profit becomes sales minus the cost of the items sold. Built after launch together with inventory, because purchases must then become stock instead of a cost. | Changes the Profit rule (SPEC 3.4); spec 2.3 "Later". Extends D38. |
 
 D1–D14 were proposed to the owner and applied by default; the owner may still change any of them.
 
