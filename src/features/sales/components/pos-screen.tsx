@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -94,10 +94,41 @@ export function PosScreen({
   const [dueDate, setDueDate] = useState("");
   const [customers, setCustomers] = useState(initialCustomers);
   const [addingCustomer, setAddingCustomer] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setErrors] = useState<Record<string, string>>({});
+  const [message, setFormError] = useState<string | null>(null);
   const [done, setDone] = useState<Done | null>(null);
   const money = (value: string) => formatMoney(value, currencyCode);
+  const cartRef = useRef<HTMLElement>(null);
+  const [cartVisible, setCartVisible] = useState(false);
+
+  // Errors describe what was typed when Charge was pressed; once anything changes they
+  // no longer apply and are hidden.
+  const snapshot = JSON.stringify([
+    cart,
+    discount,
+    paid,
+    paidAmount,
+    method,
+    amountReceived,
+    customerId,
+    dueDate,
+  ]);
+  const [checked, setChecked] = useState<string | null>(null);
+  const stale = checked !== snapshot;
+  const errors = stale ? {} : fieldErrors;
+  const formError = stale ? null : message;
+
+  // The floating "View cart" button is only needed while the cart is off screen.
+  useEffect(() => {
+    const el = cartRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setCartVisible(Boolean(entry?.isIntersecting)),
+      { threshold: 0.05 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [done]);
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -175,6 +206,7 @@ export function PosScreen({
 
   function charge() {
     setFormError(null);
+    setChecked(snapshot);
     const input: CreateSaleInput = {
       id: saleId,
       customerId,
@@ -276,7 +308,7 @@ export function PosScreen({
   const count = cart.length;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:items-start">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start">
       {/* Products */}
       <section aria-label={copy.products.title} className="flex flex-col gap-4">
         <div className="relative">
@@ -316,13 +348,13 @@ export function PosScreen({
                   )}
                 >
                   <span className="line-clamp-2 font-medium">{product.name}</span>
-                  <span className="flex items-end justify-between gap-2">
+                  <span className="flex flex-col gap-0.5">
                     <span className="text-lg font-bold text-sales-ink amount">
                       {money(product.sellingPrice)}
                     </span>
                     <span
                       className={cn(
-                        "text-xs font-medium whitespace-nowrap amount",
+                        "text-xs font-medium amount",
                         out ? "text-warning-ink" : "text-muted-foreground",
                       )}
                     >
@@ -357,6 +389,7 @@ export function PosScreen({
       {/* Cart and payment */}
       <section
         id="cart"
+        ref={cartRef}
         aria-labelledby="cart-heading"
         className="flex scroll-mt-6 flex-col gap-4 rounded-card border border-border bg-card p-4 shadow-soft lg:sticky lg:top-6"
       >
@@ -391,18 +424,21 @@ export function PosScreen({
               const priceError = errors[`items.${index}.unitPrice`];
               return (
                 <li key={line.key} className="flex flex-col gap-2 py-3">
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center justify-between gap-2">
                     {line.productId ? (
-                      <p className="font-medium">{line.description}</p>
+                      <p className="min-w-0 flex-1 font-medium">{line.description}</p>
                     ) : (
                       <Input
                         aria-label={p.itemName}
                         placeholder={p.itemName}
                         value={line.description}
                         onChange={(event) => update(line.key, { description: event.target.value })}
-                        className="h-10"
+                        className="h-10 min-w-0 flex-1"
                       />
                     )}
+                    <span className="shrink-0 font-semibold amount">
+                      {lineTotal ? money(lineTotal) : "—"}
+                    </span>
                     <button
                       type="button"
                       aria-label={p.remove(name)}
@@ -413,7 +449,7 @@ export function PosScreen({
                     </button>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center rounded-control border border-border">
+                    <div className="flex shrink-0 items-center rounded-control border border-border">
                       <button
                         type="button"
                         aria-label={p.less(name)}
@@ -447,11 +483,8 @@ export function PosScreen({
                       value={line.unitPrice}
                       onChange={(event) => update(line.key, { unitPrice: event.target.value })}
                       aria-invalid={Boolean(priceError)}
-                      className="h-11 w-24 amount"
+                      className="h-11 min-w-0 flex-1 amount"
                     />
-                    <span className="ml-auto font-semibold amount">
-                      {lineTotal ? money(lineTotal) : "—"}
-                    </span>
                   </div>
                   {qtyError || priceError ? (
                     <p className="text-sm text-destructive">{qtyError ?? priceError}</p>
@@ -604,7 +637,7 @@ export function PosScreen({
         </Button>
       </section>
 
-      {count > 0 ? (
+      {count > 0 && !cartVisible ? (
         <a
           href="#cart"
           className="fixed inset-x-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-30 flex min-h-12 items-center justify-center rounded-full bg-primary px-5 text-base font-semibold text-primary-foreground shadow-lg md:bottom-4 lg:hidden"
