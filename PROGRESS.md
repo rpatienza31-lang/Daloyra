@@ -12,6 +12,8 @@
 | 5 — Dashboard and history            | Done — approved 13 Oct 2026               |
 | 6 — Reports                          | Done — approved 13 Oct 2026               |
 | 7 — Hardening and launch             | Launched 13 Oct — legal review pending    |
+| 8 — Admin and subscriptions          | Built — waiting for owner check           |
+| 9 — Products and inventory           | Next (owner decision, 14 Oct)             |
 
 ## Phase 0 — what exists
 
@@ -188,6 +190,22 @@
     print date at the top.
 - Tested end to end against the dev database with a temporary account (deleted afterwards).
 
+## Phase 8 — try it yourself
+
+1. **Make yourself the admin.** Open https://daloyra.vercel.app in a private window → **Start
+   free trial** → sign up with `daloyra.ph@gmail.com` → click the email link within 1 hour. You
+   can stop at "Set up your business". Tell me when done; I add it to the admin list (one
+   database row) and confirm.
+2. Log in with `daloyra.ph@gmail.com`: you land on **Daloyra Admin** with the list of businesses.
+3. Log in (another browser) with your own login `rpatienza31@gmail.com` and set up your business.
+   You see the green-blue banner "Your free trial ends in 14 days" → click it → **Settings →
+   Plan** shows ₱599.00 and how to pay.
+4. Back in Admin, refresh: your business appears "On trial". Open it → **Activate Lifetime
+   (paid)** → add a note → **Confirm**. In your business, refresh: the banner is gone and Plan
+   says "Lifetime · paid".
+5. Admin → **Pause business** (needs a reason) → your business shows "This business is paused" →
+   **Reactivate**. **Admin log** lists everything you did.
+
 ## Phase 7 — what exists
 
 - **Activity log** (`/settings/activity`, owner only): every sale, purchase, payment, expense,
@@ -293,6 +311,35 @@ Do these in order. Tell me when each numbered part is done; I check it before th
    test against the live site. Then I cancel the ₱1.00 test sale.
 2. Have a lawyer review the Privacy Policy and Terms (they are drafts).
 
+## Phase 8 — what exists
+
+- **Database** (`20261018000100_admin_and_plans.sql`, applied 14 Oct):
+  - Plans: the free trial (14 days) and **Daloyra Lifetime, ₱599.00 one-time** (`plans.billing`,
+    `plans.price`).
+  - Writes need an active business **and** a running trial or a paid plan
+    (`private.subscription_allows_writes`). An ended trial blocks every write in the database.
+  - `get_my_access` (trial / trial ended / paid / paused, days left, price, plan limits).
+  - Admin: `is_platform_admin`, `admin_list_businesses` (owner, email, plan, status, signup,
+    last activity, record counts; never amounts), `admin_activate_plan`, `admin_extend_trial`
+    (7/14/30 days), `admin_set_business_status` (pause needs a reason), `admin_list_actions`.
+    Every admin action is written to `platform_admin_actions` (no client access).
+- **Database tests**: 346 checks. New `12_admin_and_plans` (26): trial access, an ended trial
+  blocks recording and adding, records are kept, extend/activate/pause/reactivate, lifetime never
+  expires, owners and signed-out visitors cannot use admin functions, the admin cannot read
+  business records, every action is logged.
+- **App**:
+  - Trial banner on every page with days left and a link to **Settings → Plan** (price, how to
+    pay: email `daloyra.ph@gmail.com`, GCash/bank details by reply, activation within the day).
+  - When the trial ends without payment the whole app shows **"Your free trial has ended"** with
+    the same payment steps (owner decision: fully blocked). CSV downloads are refused too.
+  - `/admin` (platform admins only; everyone else gets "not found"): counts by status, a
+    searchable business list with filters, a business page with **Activate Lifetime (paid)**,
+    **Extend trial**, **Pause / Reactivate**, and its admin history; `/admin/log` for all actions.
+    An admin without a business of their own lands on `/admin` after logging in.
+  - Entitlement check wired to `plans.limits` (`exports`).
+- Tested end to end on the live database with a temporary owner and a temporary admin (both
+  deleted afterwards, with their test log entries).
+
 ## Decisions (where the spec was silent or changed)
 
 | #   | Decision                                                                                                                                                       | Reason                                                                   |
@@ -351,6 +398,10 @@ Do these in order. Tell me when each numbered part is done; I check it before th
 | D52 | Privacy and Terms are plain-language drafts in copy.ts for a lawyer to review; the support email comes from an environment variable. | Legal text needs professional review. |
 | D53 | The launch smoke test logs in with a dedicated, already confirmed account instead of signing up, so it does not create accounts or send emails on every run. | Repeatable against the live site. |
 | D54 | Daloyra-dev is the live database; no separate production or test project. A second project would cost about US$10 a month, and the account's 2 free projects are used elsewhere. Safeguards: database tests run on a private copy first, database changes only with the owner's approval, live checks use temporary accounts that are deleted, preview links use the live database (try them with a test account). | Owner decision, 13 Oct (cost). |
+| D55 | The admin area uses SECURITY DEFINER `admin_*` functions that check `public.platform_admins`, not the secret-key client, so no secret key is ever configured in Vercel. | Safer: one less secret; the database enforces admin-only access. |
+| D56 | Pricing: one plan, Daloyra Lifetime, ₱599 one-time (owner, 14 Oct). Paid by GCash/bank after emailing `daloyra.ph@gmail.com`; the admin activates it. Prices live in the `plans` table. | Owner decision. |
+| D57 | When the trial ends without payment the business is fully blocked (app and database writes) until activated; records are kept and can be sent by email on request. Terms updated to say so. | Owner decision, 14 Oct. |
+| D58 | The platform admin login is `daloyra.ph@gmail.com` (added to `platform_admins` after it signs up). Paused (suspended) businesses also need a reason, shown in the admin log. | Owner decision. |
 | D49 | Product list with "profit per product" (owner choice, 13 Oct): products with selling and purchase prices, picked on a sale; Profit becomes sales minus the cost of the items sold. Built after launch together with inventory, because purchases must then become stock instead of a cost. | Changes the Profit rule (SPEC 3.4); spec 2.3 "Later". Extends D38. |
 
 D1–D14 were proposed to the owner and applied by default; the owner may still change any of them.

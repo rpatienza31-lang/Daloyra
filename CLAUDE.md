@@ -58,8 +58,11 @@ If a shortcut weakens either, don't take it.
   `can(role, action)` in `src/lib/permissions.ts`.
 - The current business is resolved on the server from membership. Never trust a `business_id`
   sent by the browser on its own.
-- `src/lib/supabase/admin.ts` (secret key, bypasses RLS) is `server-only` and reserved for the
-  Phase 8 admin area. Never use it for business data.
+- `src/lib/supabase/admin.ts` (secret key, bypasses RLS) is `server-only` and unused: the admin
+  area (`/admin`) works through `admin_*` SECURITY DEFINER functions that check
+  `public.platform_admins` in the database (D55). Never use the secret key for business data.
+- Writes need an active business AND a running trial or a paid plan
+  (`private.subscription_allows_writes`, used by `private.my_writable_business_ids`).
 - Database changes only via files in `supabase/migrations/`. Never edit the hosted DB by hand.
 - Every new table gets isolation tests in `supabase/tests/` (pgTAP). The generic checks in
   `00_schema_guards` and `01_tenant_isolation` cover new tables automatically; add table-specific

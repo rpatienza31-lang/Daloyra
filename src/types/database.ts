@@ -202,13 +202,26 @@ isOneToOne: false
                   ]
                 },"plans": {
                   Row: {
-                    "code": string,"created_at": string,"id": string,"is_active": boolean,"limits": NonNullable<Json>,"name": string,"price_monthly": number,"updated_at": string
+                    "billing": string,"code": string,"created_at": string,"id": string,"is_active": boolean,"limits": NonNullable<Json>,"name": string,"price": number,"price_monthly": number,"updated_at": string
                   }
                   Insert: {
-                    "code": string,"created_at"?: string,"id"?: string,"is_active"?: boolean,"limits"?: NonNullable<Json>,"name": string,"price_monthly"?: number,"updated_at"?: string
+                    "billing"?: string,"code": string,"created_at"?: string,"id"?: string,"is_active"?: boolean,"limits"?: NonNullable<Json>,"name": string,"price"?: number,"price_monthly"?: number,"updated_at"?: string
                   }
                   Update: {
-                    "code"?: string,"created_at"?: string,"id"?: string,"is_active"?: boolean,"limits"?: NonNullable<Json>,"name"?: string,"price_monthly"?: number,"updated_at"?: string
+                    "billing"?: string,"code"?: string,"created_at"?: string,"id"?: string,"is_active"?: boolean,"limits"?: NonNullable<Json>,"name"?: string,"price"?: number,"price_monthly"?: number,"updated_at"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"platform_admin_actions": {
+                  Row: {
+                    "action": string,"admin_email": string,"admin_user_id": string | null,"created_at": string,"details": NonNullable<Json>,"id": string,"target_business_id": string | null,"target_business_name": string
+                  }
+                  Insert: {
+                    "action": string,"admin_email": string,"admin_user_id"?: string | null,"created_at"?: string,"details"?: NonNullable<Json>,"id"?: string,"target_business_id"?: string | null,"target_business_name": string
+                  }
+                  Update: {
+                    "action"?: string,"admin_email"?: string,"admin_user_id"?: string | null,"created_at"?: string,"details"?: NonNullable<Json>,"id"?: string,"target_business_id"?: string | null,"target_business_name"?: string
                   }
                   Relationships: [
                     
@@ -546,7 +559,26 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "create_business":
+            "admin_activate_plan":
+{ Args: { "p_business_id": string,"p_note": string,"p_plan_code": string }; Returns: undefined
+                           },
+"admin_extend_trial":
+{ Args: { "p_business_id": string,"p_days": number,"p_note": string }; Returns: undefined
+                           },
+"admin_list_actions":
+{ Args: { "p_limit"?: number }; Returns: {
+              "action": string,"admin_email": string,"business_id": string,"business_name": string,"created_at": string,"details": Json
+            }[]
+                           },
+"admin_list_businesses":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "access": string,"business_type": string,"created_at": string,"customers": number,"expenses": number,"id": string,"last_activity": string,"members": number,"name": string,"owner_email": string,"owner_name": string,"plan_code": string,"plan_name": string,"purchases": number,"sales": number,"status": string,"suppliers": number,"trial_ends_at": string
+            }[]
+                           },
+"admin_set_business_status":
+{ Args: { "p_business_id": string,"p_reason": string,"p_status": string }; Returns: undefined
+                           },
+"create_business":
 { Args: { "p_address"?: string,"p_business_id": string,"p_business_type"?: string,"p_contact_number"?: string,"p_currency_code"?: string,"p_email"?: string,"p_name": string,"p_owner_name"?: string,"p_starting_cash_balance"?: string,"p_timezone"?: string }; Returns: string
                            },
 "create_cash_adjustment":
@@ -590,8 +622,14 @@ isOneToOne: false
               "expenses": string,"month": string,"profit": string,"purchases": string,"sales": string
             }[]
                            },
+"get_my_access":
+{ Args: { "p_business_id": string }; Returns: Json
+                           },
 "has_money_records":
 { Args: { "p_business_id": string }; Returns: boolean
+                           },
+"is_platform_admin":
+{ Args: Record<PropertyKey, never>; Returns: boolean
                            },
 "record_customer_payment":
 { Args: { "p_business_id": string,"p_payment": Json }; Returns: string
