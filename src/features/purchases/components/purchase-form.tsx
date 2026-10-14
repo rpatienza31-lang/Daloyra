@@ -20,6 +20,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { FormField, FormMessage, describedBy } from "@/components/forms/form-field";
 import { MethodChips } from "@/components/money/method-chips";
 import { PersonFormSheet } from "@/features/people/components/person-form-sheet";
+import { ProductSelect } from "@/features/products/components/product-select";
+import type { ProductOption } from "@/features/products/schema";
 import { copy } from "@/lib/copy";
 import { formatMoney } from "@/lib/money";
 import { cn } from "@/lib/utils";
@@ -39,6 +41,8 @@ interface Props {
   mode: "create" | "edit";
   defaults: CreatePurchaseInput;
   suppliers: { id: string; name: string }[];
+  /** Active products (plus any already on this purchase) for the product picker. */
+  products: ProductOption[];
   currencyCode: string;
   canAddSupplier: boolean;
 }
@@ -51,6 +55,7 @@ export function PurchaseForm({
   mode,
   defaults,
   suppliers: initialSuppliers,
+  products,
   currencyCode,
   canAddSupplier,
 }: Props) {
@@ -62,8 +67,10 @@ export function PurchaseForm({
   // A supplier added from this form is selected once its option has rendered.
   const [newSupplierId, setNewSupplierId] = useState<string | null>(null);
   const firstItem = defaults.items[0];
+  // With a product list, the purchase opens on its lines so products can be picked.
   const [itemsMode, setItemsMode] = useState(
     mode === "edit" ||
+      products.length > 0 ||
       defaults.items.length > 1 ||
       (firstItem !== undefined && firstItem.quantity !== "1"),
   );
@@ -153,6 +160,29 @@ export function PurchaseForm({
               const line = totals?.lines[index];
               return (
                 <li key={field.id} className="rounded-card border border-border bg-card p-3">
+                  {products.length > 0 ? (
+                    <div className="mb-2">
+                      <Controller
+                        control={form.control}
+                        name={`items.${index}.productId`}
+                        render={({ field: productField }) => (
+                          <ProductSelect
+                            id={`items.${index}.productId`}
+                            products={products}
+                            value={productField.value ?? ""}
+                            onChange={(picked) => {
+                              productField.onChange(picked?.id ?? "");
+                              if (!picked) return;
+                              form.setValue(`items.${index}.description`, picked.name);
+                              form.setValue(`items.${index}.unitCost`, picked.currentCost, {
+                                shouldValidate: form.formState.isSubmitted,
+                              });
+                            }}
+                          />
+                        )}
+                      />
+                    </div>
+                  ) : null}
                   <div className="flex items-start gap-2">
                     <div className="flex-1">
                       <label htmlFor={`items.${index}.description`} className="sr-only">
@@ -227,7 +257,9 @@ export function PurchaseForm({
             type="button"
             variant="outline"
             className="self-start"
-            onClick={() => items.append({ description: "", quantity: "1", unitCost: "" })}
+            onClick={() =>
+              items.append({ productId: "", description: "", quantity: "1", unitCost: "" })
+            }
           >
             <Plus aria-hidden />
             {s.addItem}

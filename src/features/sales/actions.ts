@@ -47,10 +47,14 @@ function firstIssue(error: z.ZodError): string {
   return error.issues[0]?.message ?? copy.common.unexpectedError;
 }
 
-/** Canonical decimal strings for the database; descriptions default to "Sale". */
+/**
+ * Canonical decimal strings for the database. A product line without a description takes
+ * the product's name (in the database); other lines default to "Sale".
+ */
 function itemsPayload(items: SaleItemInput[]) {
   return items.map((item) => ({
-    description: item.description.trim() || copy.sales.defaultDescription,
+    product_id: item.productId || null,
+    description: item.description.trim() || (item.productId ? "" : copy.sales.defaultDescription),
     quantity: parseQuantityInput(item.quantity),
     unit_price: parseMoneyInput(item.unitPrice),
   }));

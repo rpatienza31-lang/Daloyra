@@ -3,6 +3,7 @@ import {
   ArrowLeftRight,
   ArrowUpRight,
   BarChart3,
+  Boxes,
   HandCoins,
   House,
   ListChecks,
@@ -60,6 +61,10 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/customers", label: n.customers, icon: UserRound, available: true },
       { href: "/suppliers", label: n.suppliers, icon: Package, available: true },
     ],
+  },
+  {
+    label: n.groups.stock,
+    items: [{ href: "/products", label: n.products, icon: Boxes, available: true }],
   },
   {
     label: n.groups.insights,

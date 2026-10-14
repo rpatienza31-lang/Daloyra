@@ -42,6 +42,9 @@ If a shortcut weakens either, don't take it.
 - Transaction dates are SQL `date` in the business timezone (default `Asia/Manila`). "Today" is
   computed server-side in that timezone (`src/lib/dates.ts`). Weeks start Monday.
 - Payment methods: one shared list in `src/lib/payment-methods.ts`, matching the DB CHECK.
+- Profit = Sales − Cost of products sold − Other purchases − Stock lost or damaged − Expenses, in
+  `private.profit_parts` only (Phase 9). A product sale line's cost is saved by the database when
+  the sale is saved (latest purchase price, D59); product purchases become stock.
 - PostgREST returns `numeric` as a JSON number, so read amounts with a `::text` cast in the select
   (`amount:amount::text`) and pass amounts to Postgres functions as decimal strings (`text`
   parameters validated and cast inside the function).

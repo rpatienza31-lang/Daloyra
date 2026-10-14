@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
+  Boxes,
+  Building2,
+  CalendarClock,
   ChevronRight,
   CreditCard,
   HandCoins,
@@ -10,8 +13,6 @@ import {
   Truck,
   Users,
   Wallet,
-  Building2,
-  CalendarClock,
   type LucideIcon,
 } from "lucide-react";
 import { ACCENTS, type Accent } from "@/components/money/accent";
@@ -36,6 +37,7 @@ const LOOK: Record<ReportType, { icon: LucideIcon; accent: Accent }> = {
   expenses: { icon: Receipt, accent: "expenses" },
   "to-pay": { icon: CalendarClock, accent: "purchases" },
   "profit-and-loss": { icon: LineChart, accent: "profit" },
+  "profit-by-product": { icon: Boxes, accent: "profit" },
   "cash-flow": { icon: Wallet, accent: "cash" },
   "payment-methods": { icon: CreditCard, accent: "in" },
 };

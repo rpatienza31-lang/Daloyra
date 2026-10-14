@@ -20,9 +20,18 @@ const KIND_ACCENT: Record<ActivityKind, Accent> = {
   expenses: "expenses",
   cash_adjustments: "cash",
   businesses: "collect",
+  products: "sales",
+  stock_adjustments: "purchases",
 };
 
-const MONEY_FIELDS = new Set(["total", "amount", "discount_amount", "starting_cash_balance"]);
+const MONEY_FIELDS = new Set([
+  "total",
+  "amount",
+  "discount_amount",
+  "starting_cash_balance",
+  "selling_price",
+  "purchase_price",
+]);
 const DATE_FIELDS = new Set([
   "sale_date",
   "purchase_date",
@@ -31,6 +40,7 @@ const DATE_FIELDS = new Set([
   "entry_date",
   "due_date",
   "starting_balance_date",
+  "adjustment_date",
 ]);
 
 function otherMoneyKind(value: string | null): string | null {
@@ -48,6 +58,8 @@ function showValue(field: string, value: string | null, currencyCode: string): s
   if (field === "method") return PAYMENT_METHODS.find((m) => m.value === value)?.label ?? value;
   if (field === "type") return otherMoneyKind(value) ?? value;
   if (field === "direction") return value === "in" ? copy.otherMoney.in : copy.otherMoney.out;
+  if (field === "reason") return copy.products.reasons[value] ?? value;
+  if (field === "archived_at") return copy.common.archived;
   return value;
 }
 
@@ -67,6 +79,10 @@ function entryHref(e: ActivityEntry): string {
       return `/money?open=${e.recordId}`;
     case "businesses":
       return "/settings/business";
+    case "products":
+      return `/products/${e.recordId}`;
+    case "stock_adjustments":
+      return e.parentId ? `/products/${e.parentId}` : "/products";
   }
 }
 
@@ -165,7 +181,9 @@ export function ActivityList({
                           {e.changes.map((c) => (
                             <tr key={c.field} className="border-t border-border align-top">
                               <th scope="row" className="px-3 py-2 font-medium whitespace-nowrap">
-                                {t.fields[c.field] ?? c.field}
+                                {e.kind === "products" && c.field === "name"
+                                  ? t.productName
+                                  : (t.fields[c.field] ?? c.field)}
                               </th>
                               <td className="px-3 py-2 text-muted-foreground amount line-through decoration-muted-foreground/40">
                                 {showValue(c.field, c.old, currencyCode)}

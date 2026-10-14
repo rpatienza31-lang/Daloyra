@@ -18,6 +18,7 @@ export type Action =
   | "reports.view"
   | "dashboard.viewTotals"
   | "categories.manage"
+  | "products.manage"
   | "business.manageSettings"
   | "team.manage"
   | "subscription.view"
@@ -33,6 +34,7 @@ const PERMISSIONS: Record<Action, readonly Role[]> = {
   "reports.view": ["owner", "manager"],
   "dashboard.viewTotals": ["owner", "manager"],
   "categories.manage": ["owner", "manager"],
+  "products.manage": ["owner", "manager"],
   "business.manageSettings": ["owner"],
   "team.manage": ["owner"],
   "subscription.view": ["owner"],

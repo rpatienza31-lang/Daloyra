@@ -20,8 +20,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { FormField, FormMessage, describedBy } from "@/components/forms/form-field";
 import { MethodChips } from "@/components/money/method-chips";
 import { PersonFormSheet } from "@/features/people/components/person-form-sheet";
+import { ProductSelect } from "@/features/products/components/product-select";
+import type { ProductOption } from "@/features/products/schema";
 import { copy } from "@/lib/copy";
-import { formatMoney } from "@/lib/money";
+import { compareMoney, formatMoney, parseQuantityInput } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import { createSale, updateSale } from "../actions";
 import {
@@ -39,6 +41,8 @@ interface Props {
   mode: "create" | "edit";
   defaults: CreateSaleInput;
   customers: { id: string; name: string }[];
+  /** Active products (plus any already on this sale) for the product picker. */
+  products: ProductOption[];
   currencyCode: string;
   canAddCustomer: boolean;
 }
@@ -51,6 +55,7 @@ export function SaleForm({
   mode,
   defaults,
   customers: initialCustomers,
+  products,
   currencyCode,
   canAddCustomer,
 }: Props) {
@@ -62,8 +67,10 @@ export function SaleForm({
   // A customer added from this form is selected once its option has rendered.
   const [newCustomerId, setNewCustomerId] = useState<string | null>(null);
   const firstItem = defaults.items[0];
+  // With a product list, the sale opens on its lines so products can be picked.
   const [itemsMode, setItemsMode] = useState(
     mode === "edit" ||
+      products.length > 0 ||
       defaults.items.length > 1 ||
       (firstItem !== undefined && firstItem.quantity !== "1"),
   );
@@ -150,8 +157,39 @@ export function SaleForm({
             {items.fields.map((field, index) => {
               const itemErrors = errors.items?.[index];
               const line = totals?.lines[index];
+              const item = watchedItems?.[index];
+              const product = products.find((p) => p.id === item?.productId);
+              const quantity = parseQuantityInput(item?.quantity ?? "");
+              // A new sale of more than the stock is allowed, with a warning (D60).
+              const short =
+                mode === "create" && product && quantity
+                  ? compareMoney(quantity, product.onHand) > 0
+                  : false;
               return (
                 <li key={field.id} className="rounded-card border border-border bg-card p-3">
+                  {products.length > 0 ? (
+                    <div className="mb-2">
+                      <Controller
+                        control={form.control}
+                        name={`items.${index}.productId`}
+                        render={({ field: productField }) => (
+                          <ProductSelect
+                            id={`items.${index}.productId`}
+                            products={products}
+                            value={productField.value ?? ""}
+                            onChange={(picked) => {
+                              productField.onChange(picked?.id ?? "");
+                              if (!picked) return;
+                              form.setValue(`items.${index}.description`, picked.name);
+                              form.setValue(`items.${index}.unitPrice`, picked.sellingPrice, {
+                                shouldValidate: form.formState.isSubmitted,
+                              });
+                            }}
+                          />
+                        )}
+                      />
+                    </div>
+                  ) : null}
                   <div className="flex items-start gap-2">
                     <div className="flex-1">
                       <label htmlFor={`items.${index}.description`} className="sr-only">
@@ -218,6 +256,18 @@ export function SaleForm({
                       {line ? money(line) : "—"}
                     </p>
                   </div>
+                  {product && product.unit !== "" ? (
+                    <p
+                      className={cn(
+                        "mt-2 text-sm",
+                        short ? "font-medium text-warning-ink" : "text-muted-foreground",
+                      )}
+                    >
+                      {short
+                        ? copy.products.picker.stockWarning(product.onHand, product.unit)
+                        : copy.products.stockOf(product.onHand, product.unit)}
+                    </p>
+                  ) : null}
                 </li>
               );
             })}
@@ -226,7 +276,9 @@ export function SaleForm({
             type="button"
             variant="outline"
             className="self-start"
-            onClick={() => items.append({ description: "", quantity: "1", unitPrice: "" })}
+            onClick={() =>
+              items.append({ productId: "", description: "", quantity: "1", unitPrice: "" })
+            }
           >
             <Plus aria-hidden />
             {s.addItem}

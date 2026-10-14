@@ -211,7 +211,7 @@ export const copy = {
         amountToCollect: "What customers still owe you on sales that are not fully paid.",
         amountToPay: "What you still owe suppliers on purchases that are not fully paid.",
         profit:
-          "Sales minus purchases and expenses in this period, counted on the day they were recorded, paid or not.",
+          "Sales minus purchases and expenses in this period, counted on the day they were recorded, paid or not. Products you buy count when you sell them, at their latest purchase price.",
         about: (label: string) => `About ${label}`,
       },
       profitLoss: "loss",
@@ -329,7 +329,12 @@ export const copy = {
       },
       "profit-and-loss": {
         title: "Profit and Loss",
-        description: "Sales minus purchases and expenses: did the business make money?",
+        description:
+          "Sales minus the cost of what you sold, other purchases and expenses: did the business make money?",
+      },
+      "profit-by-product": {
+        title: "Profit by Product",
+        description: "How many of each product you sold, what it cost you and the profit on it.",
       },
       "cash-flow": {
         title: "Cash Flow",
@@ -377,12 +382,19 @@ export const copy = {
       moneyIn: "Money In",
       moneyOut: "Money Out",
       net: "Net",
+      product: "Product",
+      quantity: "Sold",
+      cost: "Cost",
+      profit: "Profit",
     },
     summary: {
       sales: "Sales",
       purchases: "Purchases",
       expenses: "Expenses",
       profit: "Profit",
+      costOfSales: "Cost of products sold",
+      productSales: "Product sales",
+      productCost: "Cost of products",
       total: "Total",
       paid: "Paid",
       balance: "Still owed",
@@ -396,6 +408,9 @@ export const copy = {
     lines: {
       sales: "Sales",
       purchases: "Less: Purchases",
+      costOfSales: "Less: Cost of products sold",
+      otherPurchases: "Less: Other purchases (not for stock)",
+      stockLosses: "Less: Stock lost or damaged",
       expensesHeading: "Less: Expenses",
       profit: "Profit",
       loss: "Loss",
@@ -407,6 +422,12 @@ export const copy = {
     cashFlowNote:
       "Cash at start and end follow your Cash Balance: your starting cash plus money in, minus money out, from your starting date.",
     drillDown: (method: string) => `See ${method} transactions`,
+    productNote:
+      "This is the profit on the products themselves. Your Profit and Loss also subtracts expenses, other purchases and stock that was lost or damaged.",
+    productExtraNote: (other: string, discounts: string) =>
+      `Not split per product: ${other} of items typed by hand (no cost known) and ${discounts} of discounts on whole sales. Your Profit and Loss counts them.`,
+    productPurchasesNote:
+      "Products you buy become stock: they count as a cost only when you sell them (at their latest purchase price), or when they are damaged or lost.",
   },
   status: {
     notFoundTitle: "We couldn't find that page",
@@ -683,6 +704,7 @@ export const copy = {
       moneyIn: "Money In",
       moneyOut: "Money Out",
       people: "People",
+      stock: "Stock",
       insights: "Insights",
       settings: "Settings",
     },
@@ -695,6 +717,7 @@ export const copy = {
     toPay: "To Pay",
     customers: "Customers",
     suppliers: "Suppliers",
+    products: "Products",
     transactions: "Transactions",
     reports: "Reports",
     settings: "Settings",
@@ -776,6 +799,91 @@ export const copy = {
     nameRequired: "Enter a name.",
     notFound: "This record could not be found.",
   },
+  products: {
+    title: "Products",
+    add: "Add product",
+    edit: "Edit product",
+    back: "All products",
+    added: "Product added.",
+    emptyTitle: "No products yet",
+    emptyBody:
+      "Add the things you sell. Pick them on a sale and Daloyra fills in the price, keeps count of your stock and shows the profit on each product.",
+    emptyArchived: "No archived products.",
+    searchPlaceholder: "Search products",
+    archivedToast: "Product archived. Its past sales and purchases stay in your history.",
+    restoredToast: "Product restored.",
+    archiveTitle: "Archive this product?",
+    archiveBody:
+      "It will be hidden from your lists and forms. Its past sales, purchases and stock changes stay in your history. You can restore it any time.",
+    fields: {
+      name: "Name",
+      unit: "Unit",
+      unitHint: "How you count it, for example pc, kg, pack or bottle.",
+      sellingPrice: "Selling price",
+      purchasePrice: "Purchase price",
+      purchasePriceHint:
+        "What you pay for one. Daloyra uses the price on your latest purchase when there is one.",
+      openingStock: "Stock you have now",
+      openingStockHint: "How many you already have before using Daloyra. Leave empty if none.",
+    },
+    columns: {
+      product: "Product",
+      sellingPrice: "Selling price",
+      cost: "Cost",
+      inStock: "In stock",
+    },
+    stockOf: (qty: string, unit: string) => `${qty} ${unit} in stock`,
+    lowStock: "Out of stock",
+    currentCost: "Cost now",
+    currentCostHint:
+      "The price on your latest purchase of this product, or its purchase price if you have not bought it yet. New sales use this as their cost.",
+    margin: "Profit on each",
+    history: "Stock history",
+    historyEmpty: "Purchases, sales and stock changes of this product will appear here.",
+    movement: {
+      sale: "Sale",
+      purchase: "Purchase",
+      adjustment: "Stock change",
+    },
+    reasons: {
+      opening: "Starting stock",
+      count: "Stock count",
+      damaged: "Damaged",
+      lost: "Lost",
+    } as Record<string, string>,
+    voided: "Cancelled",
+    adjust: {
+      button: "Change stock",
+      title: "Change stock",
+      reason: "Why?",
+      direction: "Add or remove?",
+      add: "Add",
+      remove: "Remove",
+      quantity: "How many?",
+      date: "Date",
+      notes: "Notes",
+      saved: "Stock updated.",
+      lossNote:
+        "Damaged and lost items count as a cost in your Profit, at the product's cost on that date.",
+      voidTitle: "Cancel this stock change?",
+      voidLabel: "Cancel change",
+      voided: "Stock change cancelled.",
+    },
+    picker: {
+      label: "Product",
+      none: "Type your own",
+      stockWarning: (qty: string, unit: string) =>
+        `Only ${qty} ${unit} in stock. You can still save; your stock will go below zero.`,
+    },
+    errors: {
+      nameRequired: "Enter a name.",
+      nameTaken: "You already have a product with this name.",
+      priceInvalid: "Enter a price like 120 or 120.50.",
+      quantityInvalid: "Enter a number like 1, 2.5 or 0.25.",
+      notFound: "This product could not be found.",
+      reasonRequired: "Say why you are cancelling it.",
+    },
+  },
   settings: {
     title: "Settings",
     tabs: {
@@ -787,7 +895,7 @@ export const copy = {
     activity: {
       title: "Activity",
       subtitle:
-        "Every sale, purchase, payment, expense and other money that was added, changed or cancelled, and who did it. Nothing here can be edited or deleted.",
+        "Every sale, purchase, payment, expense, other money, product and stock change that was added, changed or cancelled, and who did it. Nothing here can be edited or deleted.",
       empty: "Nothing has been recorded yet.",
       emptyFiltered: "No activity of this kind yet.",
       older: "Show older",
@@ -802,6 +910,8 @@ export const copy = {
         expenses: "Expenses",
         cash_adjustments: "Other money",
         businesses: "Business settings",
+        products: "Products",
+        stock_adjustments: "Stock changes",
       },
       entryKinds: {
         sales: "Sale",
@@ -811,6 +921,8 @@ export const copy = {
         expenses: "Expense",
         cash_adjustments: "Other money",
         businesses: "Business settings",
+        products: "Product",
+        stock_adjustments: "Stock change",
       },
       actions: { create: "Added", update: "Changed", void: "Cancelled" },
       by: (name: string) => `by ${name}`,
@@ -855,7 +967,16 @@ export const copy = {
         timezone: "Timezone",
         logo_path: "Logo",
         status: "Status",
+        unit: "Unit",
+        selling_price: "Selling price",
+        purchase_price: "Purchase price",
+        archived_at: "Archived",
+        product_id: "Product",
+        quantity: "Quantity",
+        reason: "Why",
+        adjustment_date: "Date",
       } as Record<string, string>,
+      productName: "Name",
     },
     business: {
       title: "Business profile",

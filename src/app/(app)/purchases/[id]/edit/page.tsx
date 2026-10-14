@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { PurchaseForm } from "@/features/purchases/components/purchase-form";
 import { getPurchase, listSupplierOptions } from "@/features/purchases/queries";
+import { listProductOptions, withDocumentProducts } from "@/features/products/queries";
 import { getCurrentBusiness } from "@/features/business/queries";
 import { copy } from "@/lib/copy";
 import { formatQuantity } from "@/lib/money";
@@ -17,9 +18,10 @@ export default async function EditPurchasePage({ params }: PageProps<"/purchases
   if (!business || !isUuid(id)) notFound();
   if (!can(business.role, "money.edit")) redirect(`/purchases/${id}`);
 
-  const [found, suppliers] = await Promise.all([
+  const [found, suppliers, activeProducts] = await Promise.all([
     getPurchase(business.id, id),
     listSupplierOptions(business.id),
+    listProductOptions(business.id),
   ]);
   if (!found) notFound();
   const { purchase, items } = found;
@@ -31,6 +33,9 @@ export default async function EditPurchasePage({ params }: PageProps<"/purchases
       ? [...suppliers, { id: purchase.supplierId, name: purchase.supplierName ?? "" }]
       : suppliers;
 
+  // Products archived since the purchase stay selectable on its lines.
+  const products = withDocumentProducts(activeProducts, items);
+
   return (
     <>
       <PageHeader title={`${copy.purchases.editTitle} ${purchase.referenceNo}`} />
@@ -38,6 +43,7 @@ export default async function EditPurchasePage({ params }: PageProps<"/purchases
         mode="edit"
         currencyCode={business.currencyCode}
         suppliers={options}
+        products={products}
         canAddSupplier={can(business.role, "people.add")}
         defaults={{
           id: purchase.id,
@@ -45,6 +51,7 @@ export default async function EditPurchasePage({ params }: PageProps<"/purchases
           purchaseDate: purchase.purchaseDate,
           referenceNo: purchase.referenceNo,
           items: items.map((i) => ({
+            productId: i.productId ?? "",
             description: i.description,
             quantity: formatQuantity(i.quantity),
             unitCost: i.unitCost,

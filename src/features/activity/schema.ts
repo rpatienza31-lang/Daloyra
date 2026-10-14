@@ -8,6 +8,8 @@ export const ACTIVITY_KINDS = [
   "expenses",
   "cash_adjustments",
   "businesses",
+  "products",
+  "stock_adjustments",
 ] as const;
 export type ActivityKind = (typeof ACTIVITY_KINDS)[number];
 

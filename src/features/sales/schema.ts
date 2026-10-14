@@ -21,6 +21,8 @@ export const PAID_OPTIONS = ["full", "part", "none"] as const;
 export type PaidOption = (typeof PAID_OPTIONS)[number];
 
 const itemSchema = z.object({
+  /** A product from the list, or "" for a line typed by hand (Phase 9). */
+  productId: z.union([z.uuid(), z.literal("")]).optional(),
   description: z.string().trim().max(200, copy.validation.tooLong(200)),
   quantity: z.string(),
   unitPrice: z.string(),
@@ -159,6 +161,7 @@ export function saleErrorMessage(key: string): string {
     payment_before_sale: e.paymentBeforeSale,
     invalid_amount: copy.validation.amountInvalid,
     invalid_quantity: e.quantityInvalid,
+    product_not_found: copy.products.errors.notFound,
     items_required: e.amountRequired,
     reason_required: e.reasonRequired,
     not_allowed: copy.common.notAllowed,

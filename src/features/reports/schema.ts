@@ -2,7 +2,10 @@ import { z } from "zod";
 import { periodRange, type PeriodKey } from "@/lib/dates";
 import { PAYMENT_METHOD_VALUES } from "@/lib/payment-methods";
 
-/** The ten reports (SPEC Section 10), by URL slug, with the Postgres function behind each. */
+/**
+ * The ten reports of SPEC Section 10, plus Profit by Product (Phase 9), by URL slug, with the
+ * Postgres function behind each.
+ */
 export const REPORTS = {
   sales: { fn: "report_sales", group: "moneyIn", defaultPeriod: "this_month" },
   "sales-by-customer": {
@@ -20,6 +23,11 @@ export const REPORTS = {
   expenses: { fn: "report_expenses", group: "moneyOut", defaultPeriod: "this_month" },
   "to-pay": { fn: "report_to_pay", group: "moneyOut", defaultPeriod: "all_time" },
   "profit-and-loss": { fn: "report_profit_loss", group: "summaries", defaultPeriod: "this_month" },
+  "profit-by-product": {
+    fn: "report_profit_by_product",
+    group: "summaries",
+    defaultPeriod: "this_month",
+  },
   "cash-flow": { fn: "report_cash_flow", group: "summaries", defaultPeriod: "this_month" },
   "payment-methods": {
     fn: "report_payment_methods",
@@ -157,7 +165,32 @@ export const reportDataSchemas = {
   expenses: envelope(categoryRow, z.object({ count: z.number(), amount })),
   "profit-and-loss": envelope(
     categoryRow,
-    z.object({ sales: amount, purchases: amount, expenses: amount, profit: amount }),
+    z.object({
+      sales: amount,
+      cost_of_sales: amount,
+      purchases: amount,
+      stock_losses: amount,
+      expenses: amount,
+      profit: amount,
+    }),
+  ),
+  "profit-by-product": envelope(
+    z.object({
+      product_id: z.uuid(),
+      product: z.string(),
+      unit: z.string(),
+      quantity: z.string(),
+      sales: amount,
+      cost: amount,
+      profit: amount,
+    }),
+    z.object({
+      sales: amount,
+      cost: amount,
+      profit: amount,
+      other_items: amount,
+      discounts: amount,
+    }),
   ),
   "cash-flow": envelope(
     z.object({ direction: z.enum(["in", "out"]), line: z.string(), amount }),

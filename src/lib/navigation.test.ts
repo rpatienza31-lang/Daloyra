@@ -11,12 +11,13 @@ describe("isActive", () => {
 });
 
 describe("NAV_GROUPS", () => {
-  it("follows the spec's grouping", () => {
+  it("follows the spec's grouping, with Stock added in Phase 9", () => {
     expect(NAV_GROUPS.map((g) => g.label)).toEqual([
       "Overview",
       "Money In",
       "Money Out",
       "People",
+      "Stock",
       "Insights",
       "Settings",
     ]);

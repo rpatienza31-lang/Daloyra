@@ -239,6 +239,25 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"products": {
+                  Row: {
+                    "archived_at": string | null,"business_id": string,"created_at": string,"created_by": string | null,"id": string,"name": string,"purchase_price": number,"selling_price": number,"unit": string,"updated_at": string,"updated_by": string | null
+                  }
+                  Insert: {
+                    "archived_at"?: string | null,"business_id": string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"name": string,"purchase_price"?: number,"selling_price"?: number,"unit"?: string,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Update: {
+                    "archived_at"?: string | null,"business_id"?: string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"name"?: string,"purchase_price"?: number,"selling_price"?: number,"unit"?: string,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "products_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"profiles": {
                   Row: {
                     "created_at": string,"email": string | null,"full_name": string | null,"id": string,"updated_at": string
@@ -254,13 +273,13 @@ isOneToOne: false
                   ]
                 },"purchase_items": {
                   Row: {
-                    "business_id": string,"created_at": string,"description": string,"id": string,"line_total": number | null,"position": number,"purchase_id": string,"quantity": number,"unit_cost": number,"updated_at": string
+                    "business_id": string,"created_at": string,"description": string,"id": string,"line_total": number | null,"position": number,"product_id": string | null,"purchase_id": string,"quantity": number,"unit_cost": number,"updated_at": string
                   }
                   Insert: {
-                    "business_id": string,"created_at"?: string,"description": string,"id"?: string,"line_total"?: never,"position": number,"purchase_id": string,"quantity": number,"unit_cost": number,"updated_at"?: string
+                    "business_id": string,"created_at"?: string,"description": string,"id"?: string,"line_total"?: never,"position": number,"product_id"?: string | null,"purchase_id": string,"quantity": number,"unit_cost": number,"updated_at"?: string
                   }
                   Update: {
-                    "business_id"?: string,"created_at"?: string,"description"?: string,"id"?: string,"line_total"?: never,"position"?: number,"purchase_id"?: string,"quantity"?: number,"unit_cost"?: number,"updated_at"?: string
+                    "business_id"?: string,"created_at"?: string,"description"?: string,"id"?: string,"line_total"?: never,"position"?: number,"product_id"?: string | null,"purchase_id"?: string,"quantity"?: number,"unit_cost"?: number,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -269,6 +288,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "businesses"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "purchase_items_business_id_product_id_fkey"
+      columns: ["business_id","product_id"]
+isOneToOne: false
+      referencedRelation: "products"
+      referencedColumns: ["business_id","id"]
     },{
       foreignKeyName: "purchase_items_business_id_purchase_id_fkey"
       columns: ["business_id","purchase_id"]
@@ -316,13 +341,13 @@ isOneToOne: false
                   ]
                 },"sale_items": {
                   Row: {
-                    "business_id": string,"created_at": string,"description": string,"id": string,"line_total": number | null,"position": number,"quantity": number,"sale_id": string,"unit_price": number,"updated_at": string
+                    "business_id": string,"cost_total": number | null,"created_at": string,"description": string,"id": string,"line_total": number | null,"position": number,"product_id": string | null,"quantity": number,"sale_id": string,"unit_cost": number | null,"unit_price": number,"updated_at": string
                   }
                   Insert: {
-                    "business_id": string,"created_at"?: string,"description": string,"id"?: string,"line_total"?: never,"position": number,"quantity": number,"sale_id": string,"unit_price": number,"updated_at"?: string
+                    "business_id": string,"cost_total"?: never,"created_at"?: string,"description": string,"id"?: string,"line_total"?: never,"position": number,"product_id"?: string | null,"quantity": number,"sale_id": string,"unit_cost"?: number | null,"unit_price": number,"updated_at"?: string
                   }
                   Update: {
-                    "business_id"?: string,"created_at"?: string,"description"?: string,"id"?: string,"line_total"?: never,"position"?: number,"quantity"?: number,"sale_id"?: string,"unit_price"?: number,"updated_at"?: string
+                    "business_id"?: string,"cost_total"?: never,"created_at"?: string,"description"?: string,"id"?: string,"line_total"?: never,"position"?: number,"product_id"?: string | null,"quantity"?: number,"sale_id"?: string,"unit_cost"?: number | null,"unit_price"?: number,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -331,6 +356,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "businesses"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sale_items_business_id_product_id_fkey"
+      columns: ["business_id","product_id"]
+isOneToOne: false
+      referencedRelation: "products"
+      referencedColumns: ["business_id","id"]
     },{
       foreignKeyName: "sale_items_business_id_sale_id_fkey"
       columns: ["business_id","sale_id"]
@@ -374,6 +405,31 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "businesses"
       referencedColumns: ["id"]
+    }
+                  ]
+                },"stock_adjustments": {
+                  Row: {
+                    "adjustment_date": string,"business_id": string,"cost_total": number | null,"created_at": string,"created_by": string | null,"id": string,"notes": string | null,"product_id": string,"quantity": number,"reason": string,"unit_cost": number,"updated_at": string,"updated_by": string | null,"void_reason": string | null,"voided_at": string | null,"voided_by": string | null
+                  }
+                  Insert: {
+                    "adjustment_date": string,"business_id": string,"cost_total"?: never,"created_at"?: string,"created_by"?: string | null,"id"?: string,"notes"?: string | null,"product_id": string,"quantity": number,"reason": string,"unit_cost": number,"updated_at"?: string,"updated_by"?: string | null,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
+                  }
+                  Update: {
+                    "adjustment_date"?: string,"business_id"?: string,"cost_total"?: never,"created_at"?: string,"created_by"?: string | null,"id"?: string,"notes"?: string | null,"product_id"?: string,"quantity"?: number,"reason"?: string,"unit_cost"?: number,"updated_at"?: string,"updated_by"?: string | null,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "stock_adjustments_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "stock_adjustments_business_id_product_id_fkey"
+      columns: ["business_id","product_id"]
+isOneToOne: false
+      referencedRelation: "products"
+      referencedColumns: ["business_id","id"]
     }
                   ]
                 },"subscriptions": {
@@ -587,11 +643,17 @@ isOneToOne: false
 "create_expense":
 { Args: { "p_business_id": string,"p_expense": Json }; Returns: string
                            },
+"create_product":
+{ Args: { "p_business_id": string,"p_product": Json }; Returns: string
+                           },
 "create_purchase":
 { Args: { "p_business_id": string,"p_purchase": Json }; Returns: string
                            },
 "create_sale":
 { Args: { "p_business_id": string,"p_sale": Json }; Returns: string
+                           },
+"create_stock_adjustment":
+{ Args: { "p_business_id": string,"p_entry": Json }; Returns: string
                            },
 "get_activity":
 { Args: { "p_before"?: string,"p_before_id"?: string,"p_business_id": string,"p_limit"?: number,"p_table"?: string }; Returns: {
@@ -624,6 +686,16 @@ isOneToOne: false
                            },
 "get_my_access":
 { Args: { "p_business_id": string }; Returns: Json
+                           },
+"get_product_movements":
+{ Args: { "p_business_id": string,"p_product_id": string }; Returns: {
+              "created_at": string,"date": string,"document_id": string,"id": string,"kind": string,"notes": string,"quantity": string,"reason": string,"reference": string,"unit_amount": string,"unit_cost": string,"voided": boolean
+            }[]
+                           },
+"get_product_stock":
+{ Args: { "p_business_id": string }; Returns: {
+              "current_cost": string,"on_hand": string,"product_id": string,"unit_profit": string
+            }[]
                            },
 "has_money_records":
 { Args: { "p_business_id": string }; Returns: boolean
@@ -671,6 +743,9 @@ isOneToOne: false
 "report_payment_methods":
 { Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: Json
                            },
+"report_profit_by_product":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: Json
+                           },
 "report_profit_loss":
 { Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: Json
                            },
@@ -692,6 +767,9 @@ isOneToOne: false
 "report_to_pay":
 { Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: Json
                            },
+"set_product_archived":
+{ Args: { "p_archived": boolean,"p_business_id": string,"p_product_id": string }; Returns: undefined
+                           },
 "update_business_settings":
 { Args: { "p_address": string,"p_business_id": string,"p_business_type": string,"p_contact_number": string,"p_currency_code": string,"p_email": string,"p_name": string,"p_owner_name": string,"p_starting_balance_date": string,"p_starting_cash_balance": string }; Returns: undefined
                            },
@@ -700,6 +778,9 @@ isOneToOne: false
                            },
 "update_expense":
 { Args: { "p_business_id": string,"p_expense": Json }; Returns: undefined
+                           },
+"update_product":
+{ Args: { "p_business_id": string,"p_product": Json }; Returns: undefined
                            },
 "update_purchase":
 { Args: { "p_business_id": string,"p_purchase": Json }; Returns: undefined
@@ -721,6 +802,9 @@ isOneToOne: false
                            },
 "void_sale":
 { Args: { "p_business_id": string,"p_reason": string,"p_sale_id": string }; Returns: undefined
+                           },
+"void_stock_adjustment":
+{ Args: { "p_business_id": string,"p_entry_id": string,"p_reason": string }; Returns: undefined
                            },
 "void_supplier_payment":
 { Args: { "p_business_id": string,"p_payment_id": string,"p_reason": string }; Returns: undefined

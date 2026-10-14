@@ -25,7 +25,14 @@ describe("buildReportView", () => {
               amount: "100.00",
             },
           ],
-          totals: { sales: "50.00", purchases: "0.00", expenses: "100.00", profit: "-50.00" },
+          totals: {
+            sales: "50.00",
+            cost_of_sales: "0.00",
+            purchases: "0.00",
+            stock_losses: "0.00",
+            expenses: "100.00",
+            profit: "-50.00",
+          },
         },
       },
       october,
@@ -39,6 +46,73 @@ describe("buildReportView", () => {
     ]);
     expect(view.totals).toEqual({ line: "Loss", amount: "-50.00" });
     expect(view.summary.at(-1)).toMatchObject({ amount: "-50.00", signed: true });
+  });
+
+  it("shows the cost of products sold once products are used (Phase 9)", () => {
+    const view = buildReportView(
+      {
+        type: "profit-and-loss",
+        data: {
+          from: "2025-10-01",
+          to: "2025-10-31",
+          rows: [],
+          totals: {
+            sales: "490.00",
+            cost_of_sales: "306.00",
+            purchases: "10.00",
+            stock_losses: "35.00",
+            expenses: "50.00",
+            profit: "89.00",
+          },
+        },
+      },
+      october,
+    );
+    expect(view.rows.map((r) => [r.cells.line, r.cells.amount])).toEqual([
+      ["Sales", "490.00"],
+      ["Less: Cost of products sold", "306.00"],
+      ["Less: Other purchases (not for stock)", "10.00"],
+      ["Less: Stock lost or damaged", "35.00"],
+      ["Less: Expenses", null],
+      ["Expenses", "50.00"],
+    ]);
+    expect(view.summary[1]).toMatchObject({ label: "Cost of products sold", amount: "306.00" });
+    expect(view.totals).toEqual({ line: "Profit", amount: "89.00" });
+  });
+
+  it("lists profit per product with links and explains what is not split", () => {
+    const view = buildReportView(
+      {
+        type: "profit-by-product",
+        data: {
+          from: "2025-10-01",
+          to: "2025-10-31",
+          rows: [
+            {
+              product_id: "a0a0a0a0-0000-4000-8000-00000000a1ce",
+              product: "Rice",
+              unit: "kg",
+              quantity: "7",
+              sales: "370.00",
+              cost: "236.00",
+              profit: "134.00",
+            },
+          ],
+          totals: {
+            sales: "370.00",
+            cost: "236.00",
+            profit: "134.00",
+            other_items: "20.00",
+            discounts: "0.00",
+          },
+        },
+      },
+      october,
+    );
+    expect(view.rows[0]?.href).toBe("/products/a0a0a0a0-0000-4000-8000-00000000a1ce");
+    expect(view.rows[0]?.cells.quantity).toBe("7 kg");
+    expect(view.totals?.profit).toBe("134.00");
+    expect(view.note).toContain("20.00");
   });
 
   it("links each payment method to its transactions for the same dates", () => {

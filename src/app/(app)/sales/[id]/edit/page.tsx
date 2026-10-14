@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { SaleForm } from "@/features/sales/components/sale-form";
 import { getSale, listCustomerOptions } from "@/features/sales/queries";
 import { getCurrentBusiness } from "@/features/business/queries";
+import { listProductOptions, withDocumentProducts } from "@/features/products/queries";
 import { copy } from "@/lib/copy";
 import { formatQuantity } from "@/lib/money";
 import { can } from "@/lib/permissions";
@@ -17,9 +18,10 @@ export default async function EditSalePage({ params }: PageProps<"/sales/[id]/ed
   if (!business || !isUuid(id)) notFound();
   if (!can(business.role, "money.edit")) redirect(`/sales/${id}`);
 
-  const [found, customers] = await Promise.all([
+  const [found, customers, activeProducts] = await Promise.all([
     getSale(business.id, id),
     listCustomerOptions(business.id),
+    listProductOptions(business.id),
   ]);
   if (!found) notFound();
   const { sale, items } = found;
@@ -31,6 +33,9 @@ export default async function EditSalePage({ params }: PageProps<"/sales/[id]/ed
       ? [...customers, { id: sale.customerId, name: sale.customerName ?? "" }]
       : customers;
 
+  // Products archived since the sale stay selectable on its lines.
+  const products = withDocumentProducts(activeProducts, items);
+
   return (
     <>
       <PageHeader title={`${copy.sales.editTitle} ${sale.referenceNo}`} />
@@ -38,6 +43,7 @@ export default async function EditSalePage({ params }: PageProps<"/sales/[id]/ed
         mode="edit"
         currencyCode={business.currencyCode}
         customers={options}
+        products={products}
         canAddCustomer={can(business.role, "people.add")}
         defaults={{
           id: sale.id,
@@ -45,6 +51,7 @@ export default async function EditSalePage({ params }: PageProps<"/sales/[id]/ed
           saleDate: sale.saleDate,
           referenceNo: sale.referenceNo,
           items: items.map((i) => ({
+            productId: i.productId ?? "",
             description: i.description,
             quantity: formatQuantity(i.quantity),
             unitPrice: i.unitPrice,
