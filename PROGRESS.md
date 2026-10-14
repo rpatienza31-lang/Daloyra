@@ -12,8 +12,8 @@
 | 5 — Dashboard and history            | Done — approved 13 Oct 2026               |
 | 6 — Reports                          | Done — approved 13 Oct 2026               |
 | 7 — Hardening and launch             | Launched 13 Oct — legal review pending    |
-| 8 — Admin and subscriptions          | Built — waiting for owner check           |
-| 9 — Products and inventory           | Next (owner decision, 14 Oct)             |
+| 8 — Admin and subscriptions          | Done — approved 14 Oct 2026               |
+| 9 — Products and inventory           | Next — decisions being made               |
 
 ## Phase 0 — what exists
 
@@ -401,7 +401,7 @@ Do these in order. Tell me when each numbered part is done; I check it before th
 | D55 | The admin area uses SECURITY DEFINER `admin_*` functions that check `public.platform_admins`, not the secret-key client, so no secret key is ever configured in Vercel. | Safer: one less secret; the database enforces admin-only access. |
 | D56 | Pricing: one plan, Daloyra Lifetime, ₱599 one-time (owner, 14 Oct). Paid by GCash/bank after emailing `daloyra.ph@gmail.com`; the admin activates it. Prices live in the `plans` table. | Owner decision. |
 | D57 | When the trial ends without payment the business is fully blocked (app and database writes) until activated; records are kept and can be sent by email on request. Terms updated to say so. | Owner decision, 14 Oct. |
-| D58 | The platform admin login is `daloyra.ph@gmail.com` (added to `platform_admins` after it signs up). Paused (suspended) businesses also need a reason, shown in the admin log. | Owner decision. |
+| D58 | The platform admin login is `daloyra.ph@gmail.com` (signed up and added to `platform_admins` on 14 Oct). Paused (suspended) businesses also need a reason, shown in the admin log. | Owner decision. |
 | D49 | Product list with "profit per product" (owner choice, 13 Oct): products with selling and purchase prices, picked on a sale; Profit becomes sales minus the cost of the items sold. Built after launch together with inventory, because purchases must then become stock instead of a cost. | Changes the Profit rule (SPEC 3.4); spec 2.3 "Later". Extends D38. |
 
 D1–D14 were proposed to the owner and applied by default; the owner may still change any of them.
