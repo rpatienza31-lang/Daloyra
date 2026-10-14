@@ -309,7 +309,9 @@ export function buildReportView(report: ReportData, period: ReportPeriod): Repor
           profit: totals.profit,
         },
         totalsTone: totals.profit.startsWith("-") ? "loss" : "profit",
-        note: extra ? r.productNote(totals.other_items, totals.discounts) : undefined,
+        note: extra
+          ? `${r.productNote} ${r.productExtraNote(totals.other_items, totals.discounts)}`
+          : r.productNote,
       };
     }
 

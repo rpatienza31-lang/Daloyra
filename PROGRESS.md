@@ -13,7 +13,7 @@
 | 6 — Reports                          | Done — approved 13 Oct 2026               |
 | 7 — Hardening and launch             | Launched 13 Oct — legal review pending    |
 | 8 — Admin and subscriptions          | Done — approved 14 Oct 2026               |
-| 9 — Products and inventory           | Next — decisions being made               |
+| 9 — Products and inventory           | Built — waiting for owner check           |
 
 ## Phase 0 — what exists
 
@@ -190,6 +190,29 @@
     print date at the top.
 - Tested end to end against the dev database with a temporary account (deleted afterwards).
 
+## Phase 9 — try it yourself
+
+Use your own login (`rpatienza31@gmail.com`) on https://daloyra.vercel.app.
+
+1. In the menu, under **Stock**, click **Products** → **Add product**. Name `Rice`, Selling price
+   `50`, Purchase price `30`, Unit `kg`, Stock you have now `10` → **Save**. The product page
+   shows **10 kg** in stock, Cost now ₱30.00 and Profit on each ₱20.00.
+2. Add a second product, `Oil`, selling `100`, purchase `70`, no stock. It shows **Out of stock**.
+3. **+ New → Purchase**. In **Product** pick `Oil`: the name and cost (₱70.00) fill in. Qty `5` →
+   **Save**. Open Products → Oil now has **5 pc**.
+4. **+ New → Sale**. Pick `Rice`: the price ₱50.00 fills in. Type Qty `12`: a warning says only
+   10 kg are in stock (you could still save). Change Qty to `3`. **Add item** → pick `Oil`,
+   Qty `1`. Total ₱250.00 → **Save sale**.
+5. Open **Products → Rice**: 7 kg in stock, and the history shows the starting stock and the
+   sale. Click **Change stock** → Why? **Damaged** → How many `1` → **Save**: 6 kg.
+6. **Reports → Profit by Product**: Rice 3 kg sold, sales ₱150.00, cost ₱90.00, profit ₱60.00;
+   Oil ₱100.00, ₱70.00, ₱30.00.
+7. **Reports → Profit and Loss**: Sales ₱250.00, less cost of products sold ₱160.00, less other
+   purchases ₱0.00 (the Oil purchase became stock), less stock damaged ₱30.00 → **Profit
+   ₱60.00**. The dashboard Profit card shows the same.
+8. When you are done, cancel the test sale, purchase and stock change (or keep them if they are
+   real) and archive the test products.
+
 ## Phase 8 — try it yourself
 
 1. **Make yourself the admin.** Open https://daloyra.vercel.app in a private window → **Start
@@ -311,6 +334,43 @@ Do these in order. Tell me when each numbered part is done; I check it before th
    test against the live site. Then I cancel the ₱1.00 test sale.
 2. Have a lawyer review the Privacy Policy and Terms (they are drafts).
 
+## Phase 9 — what exists
+
+- **Database** (`20261019000100_products_inventory.sql`, applied 14 Oct):
+  - `products` (name, unit, selling price, purchase price; archived, never deleted; one active
+    product per name). Read by everyone in the business; written only through `create_product`
+    (with optional opening stock), `update_product`, `set_product_archived` (owner and manager).
+  - Sale and purchase lines can name a product (`product_id`, composite foreign key, so never a
+    product of another business). Typed-in lines still work as before.
+  - Each product sale line keeps its cost (`sale_items.unit_cost`, `cost_total` generated),
+    set by the database when the sale is saved: the latest purchase price on or before the sale
+    date, else the product's purchase price (D59).
+  - `stock_adjustments`: starting stock, counts (add or remove), damaged and lost; voided, never
+    deleted; audit-logged. `create_stock_adjustment`, `void_stock_adjustment`.
+  - `get_product_stock` (on hand, cost now, profit on each; may go below zero, D60) and
+    `get_product_movements` (history).
+  - **Profit** everywhere (dashboard, monthly chart, Profit and Loss) =
+    Sales − Cost of products sold − Other purchases − Stock lost or damaged − Expenses, in one
+    function (`private.profit_parts`). With no products this equals the old rule exactly.
+  - New report function `report_profit_by_product`. The activity log names products and stock
+    changes.
+- **Database tests**: 377 checks. New `13_products_inventory` (31) on a hand-calculated example:
+  costs saved per line, stock, negative stock, the new Profit on the dashboard, chart and P&L,
+  profit per product, name rules, retries, roles (staff can pick products and see stock but
+  cannot add products or change stock), and tenant isolation (no selling or buying another
+  business's products, no reading its stock).
+- **App**:
+  - **Products** (`/products`, menu group "Stock"): list with price, cost and stock (phones get
+    cards), add/edit, archive/restore. Product page: in stock, selling price, cost now, profit on
+    each, **Change stock**, and the stock history with links to the sales and purchases.
+  - Sale and purchase forms: a **Product** picker on each line fills in the name and the selling
+    price (sale) or the current cost (purchase). New sales warn when the quantity is more than
+    the stock. When a business has products, both forms open on their lines.
+  - Reports: **Profit by Product** (new) and Profit and Loss with the cost of products sold,
+    other purchases and stock lost or damaged as separate lines.
+- Tested end to end on the live database with a temporary account (deleted afterwards), including
+  accessibility checks and a 360 px phone layout.
+
 ## Phase 8 — what exists
 
 - **Database** (`20261018000100_admin_and_plans.sql`, applied 14 Oct):
@@ -406,6 +466,9 @@ Do these in order. Tell me when each numbered part is done; I check it before th
 | D60 | Selling more than the stock on hand is allowed; stock can go negative and the app warns (owner choice, 14 Oct). | Owner decision. |
 | D61 | Sale and purchase lines can be a product from the list or free text as before (owner choice, 14 Oct). Product purchases become stock; free-text purchases stay a cost right away. | Owner decision. |
 | D62 | Products get an opening stock and stock adjustments (damaged, lost, count) with a reason, logged like other records (owner choice, 14 Oct). | Owner decision. |
+| D63 | Purchase discounts reduce "Other purchases" (= purchase totals − their product lines), so a discount on a stock purchase lowers costs in the period it was given; product costs use the line price. | Keeps every total reconciling with the Purchases report without splitting discounts. |
+| D64 | Everyone in the business can see products and stock (staff pick products on sales); cost and profit on each, stock history and stock changes are owner/manager only in the app. | Role-aware from day one; quantities are not money. |
+| D65 | Profit by Product uses line amounts before any discount on the whole sale; typed-in lines and sale discounts are shown as a note. A sale keeps the cost saved when it was last saved; a purchase recorded later does not change it. | Exact, explainable figures; costs never change behind the owner's back. |
 | D49 | Product list with "profit per product" (owner choice, 13 Oct): products with selling and purchase prices, picked on a sale; Profit becomes sales minus the cost of the items sold. Built after launch together with inventory, because purchases must then become stock instead of a cost. | Changes the Profit rule (SPEC 3.4); spec 2.3 "Later". Extends D38. |
 
 D1–D14 were proposed to the owner and applied by default; the owner may still change any of them.

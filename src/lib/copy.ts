@@ -422,8 +422,10 @@ export const copy = {
     cashFlowNote:
       "Cash at start and end follow your Cash Balance: your starting cash plus money in, minus money out, from your starting date.",
     drillDown: (method: string) => `See ${method} transactions`,
-    productNote: (other: string, discounts: string) =>
-      `Also sold: ${other} of items typed by hand (no cost known). Discounts on whole sales: ${discounts}. These are not split per product, so they are not in the profit above; your Profit and Loss counts them.`,
+    productNote:
+      "This is the profit on the products themselves. Your Profit and Loss also subtracts expenses, other purchases and stock that was lost or damaged.",
+    productExtraNote: (other: string, discounts: string) =>
+      `Not split per product: ${other} of items typed by hand (no cost known) and ${discounts} of discounts on whole sales. Your Profit and Loss counts them.`,
     productPurchasesNote:
       "Products you buy become stock: they count as a cost only when you sell them (at their latest purchase price), or when they are damaged or lost.",
   },
