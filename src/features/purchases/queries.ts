@@ -29,6 +29,7 @@ export interface PurchaseSummary {
 }
 
 export interface PurchaseItem {
+  productId: string | null;
   description: string;
   quantity: string;
   unitCost: string;
@@ -191,7 +192,7 @@ export async function getPurchase(
     supabase
       .from("purchase_items")
       .select(
-        "description, quantity:quantity::text, unit_cost:unit_cost::text, line_total:line_total::text",
+        "product_id, description, quantity:quantity::text, unit_cost:unit_cost::text, line_total:line_total::text",
       )
       .eq("business_id", businessId)
       .eq("purchase_id", id)
@@ -214,6 +215,7 @@ export async function getPurchase(
   return {
     purchase: toSummary(overview.data),
     items: items.data.map((i) => ({
+      productId: i.product_id,
       description: i.description,
       quantity: i.quantity,
       unitCost: i.unit_cost,

@@ -118,7 +118,7 @@ grant execute on all functions in schema tests to anon, authenticated;
 
 -- ---------------------------------------------------------------------------
 -- Setup: two users, two businesses, each with a logo, customer, supplier, paid sale,
--- paid purchase, expense and Other Money In entry
+-- paid purchase, expense, Other Money In entry and a product with opening stock
 -- ---------------------------------------------------------------------------
 select tests.create_user('11111111-1111-4111-8111-111111111111', 'a@example.com');
 select tests.create_user('22222222-2222-4222-8222-222222222222', 'b@example.com');
@@ -143,6 +143,8 @@ select public.create_expense('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', jsonb_build
   'category_id', (select id from public.expense_categories where business_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' and name = 'Rent')));
 select public.create_cash_adjustment('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', jsonb_build_object(
   'id', gen_random_uuid(), 'entry_date', '2026-10-01', 'direction', 'in', 'type', 'owner_in', 'amount', '1000'));
+select public.create_product('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', jsonb_build_object(
+  'id', gen_random_uuid(), 'name', 'Product of A', 'selling_price', '20', 'purchase_price', '12', 'opening_stock', '5'));
 
 select tests.login_as('22222222-2222-4222-8222-222222222222');
 select public.create_business('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'Shop B', 'Ben');
@@ -163,6 +165,8 @@ select public.create_expense('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', jsonb_build
   'category_id', (select id from public.expense_categories where business_id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb' and name = 'Rent')));
 select public.create_cash_adjustment('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', jsonb_build_object(
   'id', gen_random_uuid(), 'entry_date', '2026-10-01', 'direction', 'in', 'type', 'owner_in', 'amount', '1000'));
+select public.create_product('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', jsonb_build_object(
+  'id', gen_random_uuid(), 'name', 'Product of B', 'selling_price', '20', 'purchase_price', '12', 'opening_stock', '5'));
 
 select plan(27);
 

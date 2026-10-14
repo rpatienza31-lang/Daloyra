@@ -52,6 +52,11 @@ const r = copy.reports;
 const c = r.columns;
 const s = r.summary;
 
+/** "0.00" (or "-0.00"): nothing to show for this line. */
+function isZero(amount: string): boolean {
+  return /^-?0\.00$/.test(amount);
+}
+
 function transactionsLink(query: Record<string, string | null>): string {
   const q = new URLSearchParams();
   for (const [k, v] of Object.entries(query)) if (v) q.set(k, v);
@@ -202,10 +207,15 @@ export function buildReportView(report: ReportData, period: ReportPeriod): Repor
     case "profit-and-loss": {
       const { rows, totals } = report.data;
       const l = r.lines;
+      // With products, purchases of stock count when sold (Phase 9); without, the lines are
+      // exactly as before.
+      const products = !isZero(totals.cost_of_sales) || !isZero(totals.stock_losses);
       return {
         summary: [
           { label: s.sales, amount: totals.sales, accent: "sales" },
-          { label: s.purchases, amount: totals.purchases, accent: "purchases" },
+          products
+            ? { label: s.costOfSales, amount: totals.cost_of_sales, accent: "purchases" }
+            : { label: s.purchases, amount: totals.purchases, accent: "purchases" },
           { label: s.expenses, amount: totals.expenses, accent: "expenses" },
           { label: s.profit, amount: totals.profit, accent: "profit", signed: true },
         ],
@@ -215,11 +225,29 @@ export function buildReportView(report: ReportData, period: ReportPeriod): Repor
         ],
         rows: [
           { key: "sales", accent: "sales", cells: { line: l.sales, amount: totals.sales } },
+          ...(products
+            ? [
+                {
+                  key: "cost-of-sales",
+                  accent: "purchases" as const,
+                  cells: { line: l.costOfSales, amount: totals.cost_of_sales },
+                },
+              ]
+            : []),
           {
             key: "purchases",
             accent: "purchases",
-            cells: { line: l.purchases, amount: totals.purchases },
+            cells: { line: products ? l.otherPurchases : l.purchases, amount: totals.purchases },
           },
+          ...(isZero(totals.stock_losses)
+            ? []
+            : [
+                {
+                  key: "stock-losses",
+                  accent: "purchases" as const,
+                  cells: { line: l.stockLosses, amount: totals.stock_losses },
+                },
+              ]),
           {
             key: "expenses",
             style: "heading",
@@ -242,6 +270,46 @@ export function buildReportView(report: ReportData, period: ReportPeriod): Repor
           amount: totals.profit,
         },
         totalsTone: totals.profit.startsWith("-") ? "loss" : "profit",
+        note: products ? r.productPurchasesNote : undefined,
+      };
+    }
+
+    case "profit-by-product": {
+      const { rows, totals } = report.data;
+      const extra = !isZero(totals.other_items) || !isZero(totals.discounts);
+      return {
+        summary: [
+          { label: s.productSales, amount: totals.sales, accent: "sales" },
+          { label: s.productCost, amount: totals.cost, accent: "purchases" },
+          { label: s.profit, amount: totals.profit, accent: "profit", signed: true },
+        ],
+        columns: [
+          { key: "product", label: c.product, kind: "text" },
+          { key: "quantity", label: c.quantity, kind: "number" },
+          { key: "sales", label: c.sales, kind: "money" },
+          { key: "cost", label: c.cost, kind: "money" },
+          { key: "profit", label: c.profit, kind: "money" },
+        ],
+        rows: rows.map((x) => ({
+          key: x.product_id,
+          href: `/products/${x.product_id}`,
+          cells: {
+            product: x.product,
+            quantity: `${x.quantity} ${x.unit}`,
+            sales: x.sales,
+            cost: x.cost,
+            profit: x.profit,
+          },
+        })),
+        totals: {
+          product: r.total,
+          quantity: null,
+          sales: totals.sales,
+          cost: totals.cost,
+          profit: totals.profit,
+        },
+        totalsTone: totals.profit.startsWith("-") ? "loss" : "profit",
+        note: extra ? r.productNote(totals.other_items, totals.discounts) : undefined,
       };
     }
 

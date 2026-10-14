@@ -29,6 +29,7 @@ export interface SaleSummary {
 }
 
 export interface SaleItem {
+  productId: string | null;
   description: string;
   quantity: string;
   unitPrice: string;
@@ -202,7 +203,7 @@ export async function getSale(
     supabase
       .from("sale_items")
       .select(
-        "description, quantity:quantity::text, unit_price:unit_price::text, line_total:line_total::text",
+        "product_id, description, quantity:quantity::text, unit_price:unit_price::text, line_total:line_total::text",
       )
       .eq("business_id", businessId)
       .eq("sale_id", id)
@@ -225,6 +226,7 @@ export async function getSale(
   return {
     sale: toSummary(overview.data),
     items: items.data.map((i) => ({
+      productId: i.product_id,
       description: i.description,
       quantity: i.quantity,
       unitPrice: i.unit_price,

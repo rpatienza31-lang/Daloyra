@@ -39,8 +39,9 @@ describe("selectReportPeriod", () => {
 });
 
 describe("report types and data", () => {
-  it("knows the ten reports", () => {
+  it("knows the reports", () => {
     expect(isReportType("profit-and-loss")).toBe(true);
+    expect(isReportType("profit-by-product")).toBe(true);
     expect(isReportType("toString")).toBe(false);
   });
 

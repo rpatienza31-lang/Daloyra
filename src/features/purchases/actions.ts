@@ -50,7 +50,9 @@ function firstIssue(error: z.ZodError): string {
 /** Canonical decimal strings for the database; descriptions default to "Purchase". */
 function itemsPayload(items: PurchaseItemInput[]) {
   return items.map((item) => ({
-    description: item.description.trim() || copy.purchases.defaultDescription,
+    product_id: item.productId || null,
+    description:
+      item.description.trim() || (item.productId ? "" : copy.purchases.defaultDescription),
     quantity: parseQuantityInput(item.quantity),
     unit_cost: parseMoneyInput(item.unitCost),
   }));

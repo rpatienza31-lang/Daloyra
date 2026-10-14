@@ -161,8 +161,9 @@ select is(tests.r('report_expenses', '2025-10-01', '2025-10-31') -> 'totals',
 select is(tests.r('report_profit_loss', '2025-10-01', '2025-10-31') -> 'totals' ->> 'profit',
   tests.f('2025-10-01', '2025-10-31', 'profit'), 'P&L Profit = dashboard Profit (October)');
 select is(tests.r('report_profit_loss', '2025-08-01', '2025-10-31') -> 'totals',
-  '{"sales": "1399.99", "purchases": "700.00", "expenses": "150.00", "profit": "549.99"}'::jsonb,
-  'P&L across three months: 1,399.99 − 700 − 150 = 549.99');
+  '{"sales": "1399.99", "cost_of_sales": "0.00", "purchases": "700.00", "stock_losses": "0.00",
+    "expenses": "150.00", "profit": "549.99"}'::jsonb,
+  'P&L across three months: 1,399.99 − 700 − 150 = 549.99 (no products: same as before Phase 9)');
 select is(tests.r('report_profit_loss', '2025-08-01', '2025-10-31') -> 'totals' ->> 'profit',
   tests.f('2025-08-01', '2025-10-31', 'profit'), 'P&L Profit = dashboard Profit (Aug–Oct)');
 select is(jsonb_array_length(tests.r('report_profit_loss', '2025-08-01', '2025-10-31') -> 'rows'), 2,
