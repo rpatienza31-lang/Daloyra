@@ -13,7 +13,7 @@
 | 6 — Reports                          | Done — approved 13 Oct 2026               |
 | 7 — Hardening and launch             | Launched 13 Oct — legal review pending    |
 | 8 — Admin and subscriptions          | Done — approved 14 Oct 2026               |
-| 9 — Products and inventory           | Built — waiting for owner check           |
+| 9 — Products and inventory           | Done — approved 14 Oct 2026               |
 | 10 — POS sale screen and receipts    | Next (owner decision, 14 Oct)             |
 
 ## Phase 0 — what exists
