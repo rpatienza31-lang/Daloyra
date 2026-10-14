@@ -402,6 +402,10 @@ Do these in order. Tell me when each numbered part is done; I check it before th
 | D56 | Pricing: one plan, Daloyra Lifetime, ₱599 one-time (owner, 14 Oct). Paid by GCash/bank after emailing `daloyra.ph@gmail.com`; the admin activates it. Prices live in the `plans` table. | Owner decision. |
 | D57 | When the trial ends without payment the business is fully blocked (app and database writes) until activated; records are kept and can be sent by email on request. Terms updated to say so. | Owner decision, 14 Oct. |
 | D58 | The platform admin login is `daloyra.ph@gmail.com` (signed up and added to `platform_admins` on 14 Oct). Paused (suspended) businesses also need a reason, shown in the admin log. | Owner decision. |
+| D59 | Phase 9 cost of a sold product = its **latest purchase price** (owner choice, 14 Oct): the unit cost of the newest non-voided purchase of that product dated on or before the sale date, else the product's own purchase price. Saved on the sale line by the database when the sale is saved. | Owner decision; simpler than average cost. |
+| D60 | Selling more than the stock on hand is allowed; stock can go negative and the app warns (owner choice, 14 Oct). | Owner decision. |
+| D61 | Sale and purchase lines can be a product from the list or free text as before (owner choice, 14 Oct). Product purchases become stock; free-text purchases stay a cost right away. | Owner decision. |
+| D62 | Products get an opening stock and stock adjustments (damaged, lost, count) with a reason, logged like other records (owner choice, 14 Oct). | Owner decision. |
 | D49 | Product list with "profit per product" (owner choice, 13 Oct): products with selling and purchase prices, picked on a sale; Profit becomes sales minus the cost of the items sold. Built after launch together with inventory, because purchases must then become stock instead of a cost. | Changes the Profit rule (SPEC 3.4); spec 2.3 "Later". Extends D38. |
 
 D1–D14 were proposed to the owner and applied by default; the owner may still change any of them.
