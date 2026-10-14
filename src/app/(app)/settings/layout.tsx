@@ -14,6 +14,9 @@ export default async function SettingsLayout({ children }: { children: React.Rea
     { href: "/settings/categories", label: t.categories },
     { href: "/settings/account", label: t.account },
     can(business?.role, "auditLog.view") ? { href: "/settings/activity", label: t.activity } : null,
+    can(business?.role, "subscription.view")
+      ? { href: "/settings/plan", label: copy.billing.planTab }
+      : null,
   ].filter((tab) => tab !== null);
 
   return (

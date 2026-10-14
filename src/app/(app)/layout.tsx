@@ -1,11 +1,14 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Store } from "lucide-react";
+import { ShieldCheck, Store } from "lucide-react";
 import { BottomBar } from "@/components/layout/bottom-bar";
 import { LogoutButton } from "@/components/layout/logout-button";
 import { NavGroups } from "@/components/layout/nav-groups";
 import { NewSheet } from "@/components/layout/new-sheet";
 import { Toaster } from "@/components/ui/sonner";
+import { TrialBanner } from "@/features/billing/components/trial-banner";
+import { TrialEnded } from "@/features/billing/components/trial-ended";
+import { getAccess, isPlatformAdmin } from "@/features/billing/queries";
 import { getCurrentBusiness, getLogoUrl } from "@/features/business/queries";
 import { requireUserId } from "@/lib/auth";
 import { copy } from "@/lib/copy";
@@ -18,9 +21,16 @@ import { routes } from "@/lib/routes";
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   await requireUserId();
   const business = await getCurrentBusiness();
-  if (!business) redirect(routes.onboarding);
-  const logoUrl = await getLogoUrl(business.logoPath);
+  if (!business) redirect((await isPlatformAdmin()) ? "/admin" : routes.onboarding);
+  const [logoUrl, access, admin] = await Promise.all([
+    getLogoUrl(business.logoPath),
+    getAccess(business.id),
+    isPlatformAdmin(),
+  ]);
   const suspended = business.status === "suspended";
+  // Owner decision (Phase 8): once the trial ends without payment, the app is fully blocked.
+  const trialEnded = !suspended && access?.access === "trial_ended";
+  const blocked = suspended || trialEnded;
 
   const brand = (
     <Link
@@ -57,7 +67,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </span>
         </div>
         <nav aria-label={copy.nav.mainNav} className="flex-1 overflow-y-auto px-3 py-2">
-          <NavGroups />
+          {blocked ? null : <NavGroups />}
+          {admin ? (
+            <Link
+              href="/admin"
+              className="mt-5 flex min-h-11 items-center gap-3 rounded-control border border-dashed border-border px-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+            >
+              <ShieldCheck aria-hidden className="size-5" />
+              {copy.admin.adminLink}
+            </Link>
+          ) : null}
         </nav>
         <div className="border-t border-border p-3">
           <LogoutButton />
@@ -68,28 +87,36 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur print:static print:border-0 print:bg-transparent">
           <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 px-4 md:px-8 print:max-w-none print:px-0">
             {brand}
-            {suspended ? null : (
+            {blocked ? null : (
               <div className="hidden md:block print:hidden">
                 <NewSheet variant="button" />
               </div>
             )}
           </div>
         </header>
+        {!blocked && access?.access === "trial" ? (
+          <TrialBanner daysLeft={access.daysLeft ?? 0} price={access.price} />
+        ) : null}
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-6 pb-28 md:px-8 md:pt-8 md:pb-10 print:max-w-none print:p-0">
           {suspended ? (
             <div role="alert" className="rounded-card border border-destructive/30 bg-card p-6">
               <h1 className="text-xl font-bold">{copy.app.suspended.title}</h1>
               <p className="mt-2 text-muted-foreground">{copy.app.suspended.body}</p>
             </div>
+          ) : trialEnded ? (
+            <TrialEnded businessName={business.name} price={access?.price ?? "599.00"} />
           ) : (
             children
           )}
+          {blocked ? (
+            <div className="mx-auto mt-6 max-w-lg md:hidden">
+              <LogoutButton />
+            </div>
+          ) : null}
         </main>
       </div>
 
-      <div className="print:hidden">
-        <BottomBar footer={<LogoutButton />} />
-      </div>
+      <div className="print:hidden">{blocked ? null : <BottomBar footer={<LogoutButton />} />}</div>
       <Toaster />
     </div>
   );

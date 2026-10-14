@@ -1,3 +1,4 @@
+import { getAccess, isAllowed } from "@/features/billing/queries";
 import { getCurrentBusiness } from "@/features/business/queries";
 import { buildReportView, reportCsv, reportPeriodLabel } from "@/features/reports/model";
 import { runReport } from "@/features/reports/queries";
@@ -12,6 +13,9 @@ export async function GET(request: Request, { params }: RouteContext<"/reports/[
   const business = await getCurrentBusiness();
   if (!business) return new Response("Unauthorized", { status: 401 });
   if (!can(business.role, "reports.view")) return new Response("Forbidden", { status: 403 });
+  // Plan entitlement (plans.limits.exports); an ended trial or a paused business gets nothing.
+  if (!isAllowed(await getAccess(business.id), "exports"))
+    return new Response("Forbidden", { status: 403 });
 
   const search = Object.fromEntries(new URL(request.url).searchParams);
   const period = selectReportPeriod(search, REPORTS[type].defaultPeriod, business.timezone);
