@@ -11,6 +11,7 @@ import {
   Receipt,
   Settings,
   ShoppingCart,
+  Store,
   Truck,
   UserRound,
   Wallet,
@@ -42,6 +43,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: n.groups.moneyIn,
     items: [
+      { href: "/pos", label: n.pos, icon: Store, available: true },
       { href: "/sales", label: n.sales, icon: ShoppingCart, available: true },
       { href: "/receivables", label: n.toCollect, icon: HandCoins, available: true },
     ],
@@ -90,6 +92,7 @@ export interface NewItem {
 /** The "+ New" sheet (SPEC Section 12). */
 export const NEW_MONEY_ITEMS: NewItem[] = [
   { key: "sale", label: n.sale, icon: ShoppingCart, href: "/sales/new" },
+  { key: "pos", label: n.pos, icon: Store, href: "/pos" },
   { key: "expense", label: n.expense, icon: Receipt, href: "/expenses?new=1" },
   { key: "purchase", label: n.purchase, icon: Truck, href: "/purchases/new" },
   { key: "payment-received", label: n.paymentReceived, icon: ArrowDownLeft, href: "/receivables" },

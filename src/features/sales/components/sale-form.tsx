@@ -18,12 +18,13 @@ import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/select-native";
 import { Textarea } from "@/components/ui/textarea";
 import { FormField, FormMessage, describedBy } from "@/components/forms/form-field";
+import { CashReceived } from "@/components/money/cash-received";
 import { MethodChips } from "@/components/money/method-chips";
 import { PersonFormSheet } from "@/features/people/components/person-form-sheet";
 import { ProductSelect } from "@/features/products/components/product-select";
 import type { ProductOption } from "@/features/products/schema";
 import { copy } from "@/lib/copy";
-import { compareMoney, formatMoney, parseQuantityInput } from "@/lib/money";
+import { compareMoney, formatMoney, parseMoneyInput, parseQuantityInput } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import { createSale, updateSale } from "../actions";
 import {
@@ -89,6 +90,8 @@ export function SaleForm({
   const watchedItems = useWatch({ control: form.control, name: "items" });
   const discount = useWatch({ control: form.control, name: "discount" });
   const paid = useWatch({ control: form.control, name: "paid" });
+  const method = useWatch({ control: form.control, name: "method" });
+  const paidAmount = useWatch({ control: form.control, name: "paidAmount" });
   const totals = previewTotals(watchedItems ?? [], discount ?? "");
   const money = (value: string) => formatMoney(value, currencyCode);
   const needsCustomer = mode === "create" && paid !== "full";
@@ -403,6 +406,25 @@ export function SaleForm({
                 )}
               />
             </div>
+          ) : null}
+
+          {paid !== "none" && method === "cash" ? (
+            <Controller
+              control={form.control}
+              name="amountReceived"
+              render={({ field }) => (
+                <CashReceived
+                  id="amountReceived"
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                  paying={
+                    paid === "full" ? (totals?.total ?? null) : parseMoneyInput(paidAmount ?? "")
+                  }
+                  currencyCode={currencyCode}
+                  error={errors.amountReceived?.message}
+                />
+              )}
+            />
           ) : null}
 
           {needsCustomer ? (

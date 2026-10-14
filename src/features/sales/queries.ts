@@ -44,6 +44,9 @@ export interface SalePayment {
   reference: string | null;
   voidedAt: string | null;
   voidReason: string | null;
+  /** Cash handed over and the change, both computed and saved by the database (Phase 10). */
+  amountReceived: string | null;
+  change: string | null;
 }
 
 interface OverviewRow {
@@ -210,7 +213,9 @@ export async function getSale(
       .order("position"),
     supabase
       .from("customer_payments")
-      .select("id, payment_date, amount:amount::text, method, reference, voided_at, void_reason")
+      .select(
+        "id, payment_date, amount:amount::text, method, reference, voided_at, void_reason, amount_received:amount_received::text, change_amount:change_amount::text",
+      )
       .eq("business_id", businessId)
       .eq("sale_id", id)
       .order("payment_date")
@@ -240,6 +245,8 @@ export async function getSale(
       reference: p.reference,
       voidedAt: p.voided_at,
       voidReason: p.void_reason,
+      amountReceived: p.amount_received,
+      change: p.change_amount,
     })),
   };
 }
