@@ -27,6 +27,9 @@ test("log in, record a sale, see it on the dashboard", async ({ page }) => {
   await page.getByLabel("Password").fill(password ?? "");
   await page.getByRole("button", { name: "Log in" }).click();
   await page.waitForURL(/onboarding|dashboard/, { timeout: 30_000 });
+  // A new account is sent on to business setup; wait until the app has settled.
+  await page.goto("/dashboard");
+  await page.waitForLoadState("networkidle");
 
   if (page.url().includes("onboarding")) {
     await page.getByLabel("Business name").fill("Smoke Test Shop");

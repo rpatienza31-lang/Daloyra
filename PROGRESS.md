@@ -11,7 +11,7 @@
 | 4 — Purchases, expenses, other money | Done — approved 13 Oct 2026               |
 | 5 — Dashboard and history            | Done — approved 13 Oct 2026               |
 | 6 — Reports                          | Done — approved 13 Oct 2026               |
-| 7 — Hardening and launch             | Built — launch steps waiting for owner    |
+| 7 — Hardening and launch             | Launched 13 Oct — legal review pending    |
 
 ## Phase 0 — what exists
 
@@ -216,18 +216,32 @@
 - **Smoke test** `e2e/smoke.spec.ts`: log in → set up the business → record a sale → see it on
   the dashboard. Runs against any site with a dedicated test account (see the launch guide).
 
+## Launch status (13 Oct 2026)
+
+- [x] Finished app on the live site (pull request #1 merged).
+- [x] Live database: Daloyra-dev on the Pro plan, daily backups (D54). Test data wiped.
+- [x] Emails sent through Gmail (`daloyra.ph@gmail.com`, sender name "Daloyra"); sign-up
+      confirmation tested end to end by the owner.
+- [x] Smoke test passed on https://daloyra.vercel.app (log in → set up business → record a sale →
+      see it on the dashboard), with temporary accounts that were deleted afterwards.
+- [x] Support email `daloyra.ph@gmail.com` on the Privacy and Terms pages (pull request #2).
+- [ ] Lawyer review of the Privacy Policy and Terms of Use (drafts).
+
+Note: email links expire after 1 hour; a customer who clicks later can use "Send the link again".
+
 ## Launch guide (owner steps, Phase 7)
 
 Do these in order. Tell me when each numbered part is done; I check it before the next one.
 
-**A. Decisions I need from you**
+**A. Decisions (answered 13 Oct)**
 
-1. The web address: keep `daloyra.vercel.app`, or a domain you own (for example `daloyra.ph`).
-2. The support email address shown on the Privacy and Terms pages.
-3. Who sends Daloyra's emails (sign-up confirmation, password reset). Recommended: **Resend**
-   (free for up to 3,000 emails a month); it needs a domain you own.
-4. Supabase paid plan: **done**, the owner already has a Supabase subscription (13 Oct). Create
-   the production project inside that paid organization so it gets daily backups.
+1. Web address: keep `daloyra.vercel.app` (no domain to buy).
+2. Support email: `daloyra.ph@gmail.com` (shown on the Privacy and Terms pages; already in the app).
+3. Email sender: Gmail (`daloyra.ph@gmail.com`), because it needs no domain. Gmail sends up to about
+   500 emails a day, plenty for launch. Later, with a domain of your own, switch to a sender such
+   as Resend so emails come from `no-reply@your-domain`.
+4. Supabase paid plan: **done**, the owner already has a Supabase subscription. Create the
+   production project inside that paid organization so it gets daily backups.
 
 **B. Production database (Supabase)**
 
@@ -247,27 +261,30 @@ Do these in order. Tell me when each numbered part is done; I check it before th
 7. **Authentication** → **Emails** → **Templates**: make the same two changes as in the Phase 1
    setup (Confirm signup and Reset password), then **Save**.
 
-**C. Email sender (Resend)**
+**C. Email sender (Gmail)**
 
-1. resend.com → sign up → **Domains** → **Add domain** → your domain → copy the DNS records it
-   shows into your domain provider's DNS settings → back in Resend click **Verify**.
-2. Resend → **API Keys** → **Create API key** (permission: Sending access) → copy it.
-3. Supabase (daloyra-prod) → **Authentication** → **Emails** → **SMTP Settings** → turn on
-   **Enable custom SMTP**: Sender email `no-reply@YOUR-DOMAIN`, Sender name `Daloyra`, Host
-   `smtp.resend.com`, Port `465`, Username `resend`, Password = the API key. Click **Save**.
+1. Sign in to Google as `daloyra.ph@gmail.com` → open myaccount.google.com → **Security**.
+2. Turn on **2-Step Verification** if it is off (Google asks for your phone).
+3. In the search box at the top of the Google Account page type **App passwords** and open it.
+   App name: `Daloyra Supabase` → **Create**. Google shows a 16-letter password once: copy it.
+   Do not send it to anyone, including me.
+4. Supabase (daloyra-prod) → **Authentication** → **Emails** → **SMTP Settings** → turn on
+   **Enable custom SMTP** and fill in: Sender email `daloyra.ph@gmail.com`, Sender name
+   `Daloyra`, Host `smtp.gmail.com`, Port `465`, Username `daloyra.ph@gmail.com`, Password = the
+   16-letter app password (no spaces). Click **Save**.
 
 **D. Vercel (the website)**
 
-1. vercel.com → project **daloyra** → **Settings** → **Environment Variables**. For the
-   **Production** environment only, set `NEXT_PUBLIC_SUPABASE_URL` and
-   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to the values from daloyra-prod (**Project Settings** →
-   **API Keys**: the _Project URL_ and the _Publishable_ key). Leave Preview on the dev project.
-   Add `NEXT_PUBLIC_SUPPORT_EMAIL` = your support email for all environments.
-2. Custom domain (if A1 is your own domain): **Settings** → **Domains** → **Add** → follow the DNS
-   steps shown.
-3. Production branch: today Production deploys from `claude/daloyra-build-spec-dyputg`, which
-   does not have Phases 2–7. With your permission I open a pull request to bring the finished app
-   into the production branch; you merge it.
+1. vercel.com → project **daloyra** → **Settings** → **Environment Variables**. Click the
+   `NEXT_PUBLIC_SUPABASE_URL` row → **Edit**: untick **Preview** and **Development**, keep
+   **Production**, and paste the daloyra-prod _Project URL_. Do the same for
+   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` with the daloyra-prod _Publishable_ key. Both values are
+   in Supabase (daloyra-prod) → **Project Settings** → **API Keys**. Never use a key that starts
+   with `sb_secret_`.
+2. Click **Add New** twice to add the same two names again for **Preview** and **Development**
+   with the dev project values, so previews keep using the test database.
+3. **Deployments** → newest Production deployment → **⋯** → **Redeploy**.
+4. Done before: the finished app is in the production branch (pull request #1, merged 13 Oct).
 
 **E. Final check (together)**
 
@@ -333,13 +350,17 @@ Do these in order. Tell me when each numbered part is done; I check it before th
 | D51 | Activity log shows money records and business-settings changes (the audited tables); customers, suppliers and categories are not audited. Changes with no person attached show "Daloyra (system)". | SPEC 3.6 audits money records; settings affect money figures. |
 | D52 | Privacy and Terms are plain-language drafts in copy.ts for a lawyer to review; the support email comes from an environment variable. | Legal text needs professional review. |
 | D53 | The launch smoke test logs in with a dedicated, already confirmed account instead of signing up, so it does not create accounts or send emails on every run. | Repeatable against the live site. |
+| D54 | Daloyra-dev is the live database; no separate production or test project. A second project would cost about US$10 a month, and the account's 2 free projects are used elsewhere. Safeguards: database tests run on a private copy first, database changes only with the owner's approval, live checks use temporary accounts that are deleted, preview links use the live database (try them with a test account). | Owner decision, 13 Oct (cost). |
 | D49 | Product list with "profit per product" (owner choice, 13 Oct): products with selling and purchase prices, picked on a sale; Profit becomes sales minus the cost of the items sold. Built after launch together with inventory, because purchases must then become stock instead of a cost. | Changes the Profit rule (SPEC 3.4); spec 2.3 "Later". Extends D38. |
 
 D1–D14 were proposed to the owner and applied by default; the owner may still change any of them.
 
 ## Environment notes
 
-- Supabase dev project ref: `rthblabylzscojupghle` (`https://rthblabylzscojupghle.supabase.co`).
+- **Live database (since 13 Oct): Supabase project _Daloyra-dev_**, ref `rthblabylzscojupghle`
+  (`https://rthblabylzscojupghle.supabase.co`), Pro organization "Daloyra" (daily backups), Tokyo
+  region. There is no separate test project (D54). Test data was wiped on 13 Oct; the owner's login
+  was kept. Emails are sent through Gmail (`daloyra.ph@gmail.com`, custom SMTP).
 - Vercel project `daloyra`: https://daloyra.vercel.app (Production currently deploys from branch `claude/daloyra-build-spec-dyputg`). Both public Supabase variables are set for all environments.
 - The cloud sandbox network blocks `api.supabase.com`, `*.supabase.co`, `api.vercel.com` and
   `ui.shadcn.com` until they are added to the environment's allowed domains.

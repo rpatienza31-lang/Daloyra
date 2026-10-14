@@ -1,6 +1,9 @@
 /**
  * All interface text lives here so Filipino can be added later (SPEC Section 11).
  */
+/** Where customers write for help (Privacy and Terms pages). An env variable can override it. */
+export const SUPPORT_EMAIL = "daloyra.ph@gmail.com";
+
 export const copy = {
   brand: {
     name: "Daloyra",
