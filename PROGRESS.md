@@ -14,6 +14,7 @@
 | 7 — Hardening and launch             | Launched 13 Oct — legal review pending    |
 | 8 — Admin and subscriptions          | Done — approved 14 Oct 2026               |
 | 9 — Products and inventory           | Built — waiting for owner check           |
+| 10 — POS sale screen and receipts    | Next (owner decision, 14 Oct)             |
 
 ## Phase 0 — what exists
 
@@ -469,6 +470,8 @@ Do these in order. Tell me when each numbered part is done; I check it before th
 | D63 | Purchase discounts reduce "Other purchases" (= purchase totals − their product lines), so a discount on a stock purchase lowers costs in the period it was given; product costs use the line price. | Keeps every total reconciling with the Purchases report without splitting discounts. |
 | D64 | Everyone in the business can see products and stock (staff pick products on sales); cost and profit on each, stock history and stock changes are owner/manager only in the app. | Role-aware from day one; quantities are not money. |
 | D65 | Profit by Product uses line amounts before any discount on the whole sale; typed-in lines and sale discounts are shown as a note. A sale keeps the cost saved when it was last saved; a purchase recorded later does not change it. | Exact, explainable figures; costs never change behind the owner's back. |
+| D66 | Phase 10 (after Phase 9 is approved): a POS-style sale screen with product tiles, search and a cart; "Cash received" and "Change" for cash sales; a printable receipt (owner choice, 14 Oct). | Owner request; spec 2.3 "Later" lists POS and receipts, owner chose to build them. |
+| D67 | Receipts print both as a small thermal receipt (58/80 mm) and as a full page / PDF to send to customers (owner choice, 14 Oct). | Owner decision. |
 | D49 | Product list with "profit per product" (owner choice, 13 Oct): products with selling and purchase prices, picked on a sale; Profit becomes sales minus the cost of the items sold. Built after launch together with inventory, because purchases must then become stock instead of a cost. | Changes the Profit rule (SPEC 3.4); spec 2.3 "Later". Extends D38. |
 
 D1–D14 were proposed to the owner and applied by default; the owner may still change any of them.
