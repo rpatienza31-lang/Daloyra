@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Printer } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/layout/page-header";
 import { DueStatusText, SaleStatusPill } from "@/components/money/sale-status-pill";
 import { PaymentsList } from "@/features/sales/components/payments-list";
@@ -60,6 +61,12 @@ export default async function SalePage({ params }: PageProps<"/sales/[id]">) {
                 canEdit={can(business.role, "money.edit")}
                 canVoid={can(business.role, "money.void")}
               />
+              <Button asChild variant="outline">
+                <Link href={`/receipts/${sale.id}`}>
+                  <Printer aria-hidden />
+                  {s.printReceipt}
+                </Link>
+              </Button>
             </div>
           )
         }

@@ -60,6 +60,12 @@ export function PaymentsList({
                   {formatDate(p.paymentDate)}
                   {p.reference ? ` · ${p.reference}` : ""}
                 </p>
+                {p.amountReceived && p.change ? (
+                  <p className="text-sm text-muted-foreground amount">
+                    {s.cashReceived} {formatMoney(p.amountReceived, currencyCode)} · {s.change}{" "}
+                    {formatMoney(p.change, currencyCode)}
+                  </p>
+                ) : null}
                 {voided && p.voidReason ? (
                   <p className="text-xs text-muted-foreground">{s.voidedBy(p.voidReason)}</p>
                 ) : null}

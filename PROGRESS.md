@@ -13,7 +13,8 @@
 | 6 — Reports                          | Done — approved 13 Oct 2026               |
 | 7 — Hardening and launch             | Launched 13 Oct — legal review pending    |
 | 8 — Admin and subscriptions          | Done — approved 14 Oct 2026               |
-| 9 — Products and inventory           | Built — waiting for owner check           |
+| 9 — Products and inventory           | Done — approved 14 Oct 2026               |
+| 10 — POS sale screen and receipts    | Built — waiting for owner check           |
 
 ## Phase 0 — what exists
 
@@ -190,6 +191,27 @@
     print date at the top.
 - Tested end to end against the dev database with a temporary account (deleted afterwards).
 
+## Phase 10 — try it yourself
+
+Use your own login on https://daloyra.vercel.app (after merging the pull request).
+
+1. In the menu, under **Money In**, click **POS**. Your products show as tiles.
+2. Tap **Cooking Oil 1 liter** and **Dinorado Rice 25kg**. Both appear in the **Cart** on the
+   right (on a phone, tap **View cart** at the bottom). Total: ₱1,320.00. Tap a tile again to
+   add one more, or use − / +.
+3. Keep **Paid in full** and **Cash**. Under **Cash received** tap **₱1,500.00** (or type it).
+   **Change** shows **₱180.00**.
+4. Tap **Charge ₱1,320.00**. The screen says **Sale saved** with the change.
+5. Tap **Print receipt**: a small receipt opens in a new tab. Switch between **Small (58 mm)**,
+   **Small (80 mm)** and **Full page / PDF**, then **Print** (to make a PDF, choose "Save as PDF"
+   as the printer).
+6. Back on the POS, tap **New sale**. Try **Paid part** or **Not yet**: you must choose a
+   customer, as on the normal sale form.
+7. Open the sale from **Sales**: the payment says "Cash received ₱1,500.00 · Change ₱180.00" and
+   there is a **Print receipt** button. The normal **New sale** form has the same Cash received
+   box.
+8. Cancel the test sales afterwards if they were not real.
+
 ## Phase 9 — try it yourself
 
 Use your own login (`rpatienza31@gmail.com`) on https://daloyra.vercel.app.
@@ -334,6 +356,31 @@ Do these in order. Tell me when each numbered part is done; I check it before th
    test against the live site. Then I cancel the ₱1.00 test sale.
 2. Have a lawyer review the Privacy Policy and Terms (they are drafts).
 
+## Phase 10 — what exists
+
+- **Database** (`20261020000100_pos_receipts.sql`, applied 14 Oct): `customer_payments` gains
+  `amount_received` (optional, never less than the payment, cannot be changed afterwards) and
+  `change_amount` (generated). `create_sale` and `record_customer_payment` accept
+  `amount_received` and refuse less than the payment (`received_too_little`).
+- **Database tests**: 385 checks. New `14_pos_receipts` (8).
+- **App**:
+  - **POS** (`/pos`, menu Money In, and in **+ New**): searchable product tiles showing price,
+    stock and how many are in the cart; "Other item" for anything not in the list; a cart with
+    − / + and editable prices; discount; Paid in full / part / not yet with a customer;
+    payment method; **Cash received** with quick amounts and the **Change**. Saving goes through
+    the same `create_sale` as the sale form. Afterwards: Print receipt, Full page / PDF, View
+    sale, New sale. On phones the cart sits under the tiles, with a "View cart" button while it
+    is off screen.
+  - **Receipts** (`/receipts/[id]`, outside the app frame so only the receipt prints): small
+    58 mm and 80 mm thermal receipts and a full page (Save as PDF from the print dialog), with
+    the business logo, name, address and contact, items, total, payments, cash received and
+    change, balance due, "Thank you!" and "This is not a BIR official receipt." Cancelled sales
+    are marked "CANCELLED — NOT VALID".
+  - The sale form has the same Cash received box; the sale page shows the change and a **Print
+    receipt** button.
+- Tested end to end on the live database with a temporary account (deleted afterwards),
+  including accessibility checks and a 360 px phone layout.
+
 ## Phase 9 — what exists
 
 - **Database** (`20261019000100_products_inventory.sql`, applied 14 Oct):
@@ -469,6 +516,9 @@ Do these in order. Tell me when each numbered part is done; I check it before th
 | D63 | Purchase discounts reduce "Other purchases" (= purchase totals − their product lines), so a discount on a stock purchase lowers costs in the period it was given; product costs use the line price. | Keeps every total reconciling with the Purchases report without splitting discounts. |
 | D64 | Everyone in the business can see products and stock (staff pick products on sales); cost and profit on each, stock history and stock changes are owner/manager only in the app. | Role-aware from day one; quantities are not money. |
 | D65 | Profit by Product uses line amounts before any discount on the whole sale; typed-in lines and sale discounts are shown as a note. A sale keeps the cost saved when it was last saved; a purchase recorded later does not change it. | Exact, explainable figures; costs never change behind the owner's back. |
+| D66 | Phase 10 (after Phase 9 is approved): a POS-style sale screen with product tiles, search and a cart; "Cash received" and "Change" for cash sales; a printable receipt (owner choice, 14 Oct). | Owner request; spec 2.3 "Later" lists POS and receipts, owner chose to build them. |
+| D67 | Receipts print both as a small thermal receipt (58/80 mm) and as a full page / PDF to send to customers (owner choice, 14 Oct). | Owner decision. |
+| D68 | Receipts say "Sales receipt" with the footer "This is not a BIR official receipt." The sale's reference number (S-0001) is the receipt number. | Daloyra is not a BIR-accredited invoicing system; the owner can ask to change the wording. |
 | D49 | Product list with "profit per product" (owner choice, 13 Oct): products with selling and purchase prices, picked on a sale; Profit becomes sales minus the cost of the items sold. Built after launch together with inventory, because purchases must then become stock instead of a cost. | Changes the Profit rule (SPEC 3.4); spec 2.3 "Later". Extends D38. |
 
 D1–D14 were proposed to the owner and applied by default; the owner may still change any of them.

@@ -103,9 +103,26 @@ export const createSaleSchema = baseSaleSchema
     paid: z.enum(PAID_OPTIONS),
     paidAmount: z.string().trim(),
     method: z.enum(PAYMENT_METHOD_VALUES),
+    /** Cash handed over (Phase 10); the database saves the change. Optional. */
+    amountReceived: z.string().trim().optional(),
   })
   .superRefine((sale, ctx) => {
     const totals = checkSale(sale, ctx);
+    const received = sale.amountReceived ?? "";
+    if (received !== "" && sale.paid !== "none" && sale.method === "cash") {
+      const amount = parseMoneyInput(received);
+      const paying =
+        sale.paid === "full" ? (totals?.total ?? null) : parseMoneyInput(sale.paidAmount);
+      if (amount === null) {
+        ctx.addIssue({
+          code: "custom",
+          message: copy.validation.amountInvalid,
+          path: ["amountReceived"],
+        });
+      } else if (paying !== null && compareMoney(amount, paying) < 0) {
+        ctx.addIssue({ code: "custom", message: e.receivedTooLittle, path: ["amountReceived"] });
+      }
+    }
     if (sale.paid !== "full" && sale.customerId === "") {
       ctx.addIssue({ code: "custom", message: e.customerRequired, path: ["customerId"] });
     }
@@ -159,6 +176,7 @@ export function saleErrorMessage(key: string): string {
     not_found: e.notFound,
     customer_not_found: e.customerNotFound,
     payment_before_sale: e.paymentBeforeSale,
+    received_too_little: e.receivedTooLittle,
     invalid_amount: copy.validation.amountInvalid,
     invalid_quantity: e.quantityInvalid,
     product_not_found: copy.products.errors.notFound,

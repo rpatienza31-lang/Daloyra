@@ -99,6 +99,11 @@ export async function createSale(input: CreateSaleInput): Promise<ActionResult> 
             amount: sale.paid === "full" ? "full" : parseMoneyInput(sale.paidAmount),
             method: sale.method,
             payment_date: sale.saleDate,
+            // Cash received only makes sense for cash; a value left from switching is dropped.
+            amount_received:
+              sale.method === "cash" && sale.amountReceived
+                ? parseMoneyInput(sale.amountReceived)
+                : null,
           },
   } satisfies Json;
 

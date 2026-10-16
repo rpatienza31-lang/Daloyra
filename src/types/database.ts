@@ -96,13 +96,13 @@ isOneToOne: false
                   ]
                 },"customer_payments": {
                   Row: {
-                    "amount": number,"business_id": string,"created_at": string,"created_by": string | null,"customer_id": string | null,"id": string,"method": string,"notes": string | null,"payment_date": string,"reference": string | null,"sale_id": string,"updated_at": string,"updated_by": string | null,"void_reason": string | null,"voided_at": string | null,"voided_by": string | null
+                    "amount": number,"amount_received": number | null,"business_id": string,"change_amount": number | null,"created_at": string,"created_by": string | null,"customer_id": string | null,"id": string,"method": string,"notes": string | null,"payment_date": string,"reference": string | null,"sale_id": string,"updated_at": string,"updated_by": string | null,"void_reason": string | null,"voided_at": string | null,"voided_by": string | null
                   }
                   Insert: {
-                    "amount": number,"business_id": string,"created_at"?: string,"created_by"?: string | null,"customer_id"?: string | null,"id"?: string,"method"?: string,"notes"?: string | null,"payment_date": string,"reference"?: string | null,"sale_id": string,"updated_at"?: string,"updated_by"?: string | null,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
+                    "amount": number,"amount_received"?: number | null,"business_id": string,"change_amount"?: never,"created_at"?: string,"created_by"?: string | null,"customer_id"?: string | null,"id"?: string,"method"?: string,"notes"?: string | null,"payment_date": string,"reference"?: string | null,"sale_id": string,"updated_at"?: string,"updated_by"?: string | null,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
                   }
                   Update: {
-                    "amount"?: number,"business_id"?: string,"created_at"?: string,"created_by"?: string | null,"customer_id"?: string | null,"id"?: string,"method"?: string,"notes"?: string | null,"payment_date"?: string,"reference"?: string | null,"sale_id"?: string,"updated_at"?: string,"updated_by"?: string | null,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
+                    "amount"?: number,"amount_received"?: number | null,"business_id"?: string,"change_amount"?: never,"created_at"?: string,"created_by"?: string | null,"customer_id"?: string | null,"id"?: string,"method"?: string,"notes"?: string | null,"payment_date"?: string,"reference"?: string | null,"sale_id"?: string,"updated_at"?: string,"updated_by"?: string | null,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
                   }
                   Relationships: [
                     {

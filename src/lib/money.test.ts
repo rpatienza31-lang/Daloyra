@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  cashSuggestions,
   compareMoney,
   formatMoney,
   formatQuantity,
@@ -112,5 +113,13 @@ describe("sharePercent", () => {
     expect(sharePercent("0.01", "1000.00")).toBe("<1%");
     expect(sharePercent("0.00", "1000.00")).toBe("0%");
     expect(sharePercent("5.00", "0.00")).toBe("0%");
+  });
+});
+
+describe("cashSuggestions", () => {
+  it("offers the exact amount, then the next round notes", () => {
+    expect(cashSuggestions("1320.00")).toEqual(["1320.00", "1350.00", "1400.00", "1500.00"]);
+    expect(cashSuggestions("180")).toEqual(["180.00", "200.00", "500.00", "1000.00"]);
+    expect(cashSuggestions("1000")).toEqual(["1000.00"]);
   });
 });

@@ -100,3 +100,22 @@ export function sharePercent(part: Decimal.Value, whole: Decimal.Value): string 
   if (pct.greaterThan(0) && pct.lessThan(1)) return "<1%";
   return `${pct.toDecimalPlaces(0, Decimal.ROUND_HALF_UP).toFixed(0)}%`;
 }
+
+/**
+ * Amounts a customer is likely to hand over for a cash payment: the exact amount, then the
+ * next round notes (₱20, ₱50, ₱100, ₱500, ₱1,000). At most four. For buttons only.
+ */
+export function cashSuggestions(paying: Decimal.Value): string[] {
+  const amount = new MoneyDecimal(paying);
+  const out = [amount.toFixed(2)];
+  for (const note of [20, 50, 100, 500, 1000]) {
+    const up = amount.div(note).ceil().times(note);
+    if (up.greaterThan(amount)) out.push(up.toFixed(2));
+  }
+  return [...new Set(out)].slice(0, 4);
+}
+
+/** a + b for quantities in a live cart preview (up to 3 decimals). Never saved. */
+export function addQuantity(a: Decimal.Value, b: Decimal.Value): string {
+  return new MoneyDecimal(a).plus(b).toDecimalPlaces(3).toString();
+}
