@@ -674,6 +674,11 @@ isOneToOne: false
 "get_dashboard":
 { Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: Json
                            },
+"get_inventory_totals":
+{ Args: { "p_archived"?: boolean,"p_business_id": string }; Returns: {
+              "cost_received": string,"current_value": string,"products": number
+            }[]
+                           },
 "get_money_by_method":
 { Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: {
               "method": string,"money_in": string,"money_out": string,"net": string
@@ -694,7 +699,7 @@ isOneToOne: false
                            },
 "get_product_stock":
 { Args: { "p_business_id": string }; Returns: {
-              "current_cost": string,"on_hand": string,"product_id": string,"unit_profit": string
+              "adjusted": string,"average_cost": string,"cost_received": string,"current_cost": string,"current_value": string,"on_hand": string,"product_id": string,"received": string,"sold": string,"unit_profit": string
             }[]
                            },
 "has_money_records":

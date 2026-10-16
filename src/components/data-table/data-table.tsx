@@ -59,6 +59,8 @@ interface DataTableProps<T extends RowData> {
   /** Or: makes each row (and card) a button, e.g. to open a side sheet. */
   onRowClick?: (row: T) => void;
   getRowId: (row: T) => string;
+  /** Column ids of numbers and amounts: right-aligned on one line. */
+  numericColumns?: readonly string[];
 }
 
 /**
@@ -73,6 +75,7 @@ export function DataTable<T extends RowData>({
   rowHref,
   onRowClick,
   getRowId,
+  numericColumns = [],
 }: DataTableProps<T>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
@@ -155,7 +158,7 @@ export function DataTable<T extends RowData>({
           </ul>
 
           {/* Tablets and up: a table */}
-          <div className="hidden overflow-hidden rounded-card border border-border bg-card shadow-soft md:block">
+          <div className="hidden overflow-x-auto rounded-card border border-border bg-card shadow-soft md:block">
             <table className="w-full text-sm">
               <thead className="border-b border-border bg-muted/60 text-left text-xs tracking-wide text-muted-foreground uppercase">
                 {table.getHeaderGroups().map((group) => (
@@ -173,7 +176,11 @@ export function DataTable<T extends RowData>({
                                 ? "descending"
                                 : undefined
                           }
-                          className="px-4 py-3 font-medium"
+                          className={cn(
+                            "px-4 py-3 font-medium",
+                            numericColumns.includes(header.column.id) &&
+                              "text-right whitespace-nowrap",
+                          )}
                         >
                           {header.column.getCanSort() ? (
                             <button
@@ -210,7 +217,14 @@ export function DataTable<T extends RowData>({
                       )}
                     >
                       {row.getAllCells().map((cell, i) => (
-                        <td key={cell.id} className="px-4 py-3.5 align-middle">
+                        <td
+                          key={cell.id}
+                          className={cn(
+                            "px-4 py-3.5 align-middle",
+                            numericColumns.includes(cell.column.id) &&
+                              "text-right whitespace-nowrap amount",
+                          )}
+                        >
                           {href && i === 0 ? (
                             <Link
                               href={href}

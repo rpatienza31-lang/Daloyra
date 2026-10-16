@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ProductsList } from "@/features/products/components/products-list";
-import { listProducts } from "@/features/products/queries";
+import { getInventoryTotals, listProducts } from "@/features/products/queries";
 import { getCurrentBusiness } from "@/features/business/queries";
 import { copy } from "@/lib/copy";
 import { can } from "@/lib/permissions";
@@ -12,11 +12,15 @@ export default async function ProductsPage({ searchParams }: PageProps<"/product
   if (!business) return null;
   const params = await searchParams;
   const showArchived = params.show === "archived";
-  const products = await listProducts(business.id, showArchived);
+  const [products, totals] = await Promise.all([
+    listProducts(business.id, showArchived),
+    getInventoryTotals(business.id, showArchived),
+  ]);
 
   return (
     <ProductsList
       products={products}
+      totals={totals}
       showArchived={showArchived}
       canManage={can(business.role, "products.manage")}
       currencyCode={business.currencyCode}

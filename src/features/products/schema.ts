@@ -66,6 +66,17 @@ export interface Product {
   currentCost: string;
   /** Selling price minus current cost, computed in the database. */
   unitProfit: string;
+  /** Bought plus starting stock (D69). */
+  received: string;
+  sold: string;
+  /** Stock counts, damaged and lost, signed. */
+  adjusted: string;
+  /** Purchase line totals plus starting stock at its cost. */
+  costReceived: string;
+  /** Cost received ÷ received; null when nothing was received. */
+  averageCost: string | null;
+  /** Qty on hand × selling price (0 when nothing is on hand). */
+  currentValue: string;
 }
 
 /** What the sale and purchase forms need to offer a product on a line. */
