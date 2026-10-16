@@ -832,7 +832,24 @@ export const copy = {
       sellingPrice: "Selling price",
       cost: "Cost",
       inStock: "In stock",
+      received: "Received",
+      sold: "Sold",
+      adjusted: "Adjusted",
+      onHand: "Qty on hand",
+      costReceived: "Total cost received",
+      averageCost: "Average cost each",
+      currentValue: "Total current value",
     },
+    totals: {
+      costReceived: "Total cost received",
+      costReceivedInfo:
+        "What you paid for the stock you received: your purchases of these products plus their starting stock.",
+      currentValue: "Total current value",
+      currentValueInfo:
+        "What your stock on hand is worth at your selling prices: Qty on hand × selling price.",
+    },
+    adjustedHint:
+      "Qty on hand = Received − Sold + Adjusted. Received is purchases plus starting stock; Adjusted is stock counts, damaged and lost.",
     stockOf: (qty: string, unit: string) => `${qty} ${unit} in stock`,
     lowStock: "Out of stock",
     currentCost: "Cost now",

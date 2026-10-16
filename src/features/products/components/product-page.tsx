@@ -49,8 +49,20 @@ export async function ProductPage({ id }: { id: string }) {
               </span>
             ),
           },
+          { label: t.columns.received, value: `${product.received} ${product.unit}` },
+          { label: t.columns.sold, value: `${product.sold} ${product.unit}` },
+          {
+            label: t.columns.adjusted,
+            value: product.adjusted === "0" ? "—" : `${product.adjusted} ${product.unit}`,
+          },
+          { label: t.columns.costReceived, value: money(product.costReceived) },
+          {
+            label: t.columns.averageCost,
+            value: product.averageCost ? money(product.averageCost) : "—",
+          },
         ]
       : []),
+    { label: t.columns.currentValue, value: money(product.currentValue) },
   ];
 
   return (

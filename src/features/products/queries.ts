@@ -12,6 +12,38 @@ async function stockById(businessId: string) {
   return new Map(data.map((row) => [row.product_id, row]));
 }
 
+type StockRow = Awaited<ReturnType<typeof stockById>> extends Map<string, infer R> ? R : never;
+
+function toProduct(
+  row: {
+    id: string;
+    name: string;
+    unit: string;
+    selling_price: string;
+    purchase_price: string;
+    archived_at: string | null;
+  },
+  s: StockRow | undefined,
+): Product {
+  return {
+    id: row.id,
+    name: row.name,
+    unit: row.unit,
+    sellingPrice: row.selling_price,
+    purchasePrice: row.purchase_price,
+    archivedAt: row.archived_at,
+    onHand: s?.on_hand ?? "0",
+    currentCost: s?.current_cost ?? row.purchase_price,
+    unitProfit: s?.unit_profit ?? "0.00",
+    received: s?.received ?? "0",
+    sold: s?.sold ?? "0",
+    adjusted: s?.adjusted ?? "0",
+    costReceived: s?.cost_received ?? "0.00",
+    averageCost: s?.average_cost ?? null,
+    currentValue: s?.current_value ?? "0.00",
+  };
+}
+
 /** Products of the business, active or archived, by name, with stock and cost. */
 export async function listProducts(businessId: string, archived: boolean): Promise<Product[]> {
   const supabase = await createClient();
@@ -25,20 +57,7 @@ export async function listProducts(businessId: string, archived: boolean): Promi
     stockById(businessId),
   ]);
   if (error) throw new Error("Could not load products.", { cause: error });
-  return data.map((row) => {
-    const s = stock.get(row.id);
-    return {
-      id: row.id,
-      name: row.name,
-      unit: row.unit,
-      sellingPrice: row.selling_price,
-      purchasePrice: row.purchase_price,
-      archivedAt: row.archived_at,
-      onHand: s?.on_hand ?? "0",
-      currentCost: s?.current_cost ?? row.purchase_price,
-      unitProfit: s?.unit_profit ?? "0.00",
-    };
-  });
+  return data.map((row) => toProduct(row, stock.get(row.id)));
 }
 
 export async function getProduct(businessId: string, id: string): Promise<Product | null> {
@@ -54,17 +73,29 @@ export async function getProduct(businessId: string, id: string): Promise<Produc
   ]);
   if (error) throw new Error("Could not load the product.", { cause: error });
   if (!data) return null;
-  const s = stock.get(data.id);
+  return toProduct(data, stock.get(data.id));
+}
+
+export interface InventoryTotals {
+  products: number;
+  costReceived: string;
+  currentValue: string;
+}
+
+/** Total cost received and total current value of the active (or archived) products. */
+export async function getInventoryTotals(
+  businessId: string,
+  archived: boolean,
+): Promise<InventoryTotals> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .rpc("get_inventory_totals", { p_business_id: businessId, p_archived: archived })
+    .single();
+  if (error) throw new Error("Could not load inventory totals.", { cause: error });
   return {
-    id: data.id,
-    name: data.name,
-    unit: data.unit,
-    sellingPrice: data.selling_price,
-    purchasePrice: data.purchase_price,
-    archivedAt: data.archived_at,
-    onHand: s?.on_hand ?? "0",
-    currentCost: s?.current_cost ?? data.purchase_price,
-    unitProfit: s?.unit_profit ?? "0.00",
+    products: data.products,
+    costReceived: data.cost_received,
+    currentValue: data.current_value,
   };
 }
 
